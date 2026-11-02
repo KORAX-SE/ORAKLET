@@ -3,10 +3,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#000000">
 <meta name="description" content="Oraklet — Built for one. Open to everyone.">
-<title>Oraklet — 0.2</title>
+<title>Oraklet — 0.3</title>
 
 <style>
 :root {
@@ -15,23 +15,23 @@
   --fg: #fff;
   --muted: #999;
   --line: #fff;
-  --duration: 850ms;
-  --ease: cubic-bezier(.22, 1, .36, 1);
+  --speed: 900ms;
+  --ease: cubic-bezier(.22,1,.36,1);
   --closed: 64px;
 }
 
 * { box-sizing: border-box; }
 
-html, body {
-  margin: 0;
+html,body {
   width: 100%;
-  min-height: 100%;
+  height: 100%;
+  margin: 0;
 }
 
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial,Helvetica,sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -39,24 +39,22 @@ button { font: inherit; }
 
 .app {
   height: 100dvh;
-  min-height: 360px;
+  min-height: 350px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  padding: 20px;
   gap: 14px;
 }
 
-.header, .footer {
+.header,.footer {
+  flex: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-shrink: 0;
   gap: 12px;
 }
 
-.header {
-  font-size: 13px;
-}
+.header { font-size: 13px; }
 
 .footer {
   font-size: 11px;
@@ -65,79 +63,103 @@ button { font: inherit; }
 
 .rail {
   position: relative;
-  display: flex;
   flex: 1;
   min-height: 0;
+  width: 100%;
   overflow: hidden;
   border: 1px solid var(--line);
+  background: #000;
 }
 
 .panel {
-  position: relative;
-  flex: 0 0 var(--closed);
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
   padding: 0;
+  margin: 0;
   border: 0;
-  border-right: 1px solid var(--line);
   border-radius: 0;
-  background: var(--bg);
-  color: var(--fg);
+  background: #000;
+  color: #fff;
   text-align: left;
   cursor: pointer;
-  transition: flex-basis var(--duration) var(--ease);
-  will-change: flex-basis;
+  overflow: hidden;
+  isolation: isolate;
+
+  transition:
+    left var(--speed) var(--ease),
+    top var(--speed) var(--ease),
+    width var(--speed) var(--ease),
+    height var(--speed) var(--ease);
 }
 
-.panel:last-child { border-right: 0; }
+.panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-right: 1px solid var(--line);
+  pointer-events: none;
+}
 
-.panel.active {
-  flex: 1 1 0;
-  cursor: default;
+.panel:last-child::after {
+  border-right: 0;
 }
 
 .panel:focus-visible {
-  outline: 2px solid var(--fg);
-  outline-offset: -4px;
-  z-index: 5;
+  outline: 2px solid #fff;
+  outline-offset: -3px;
+  z-index: 10;
 }
+
+.panel.active { cursor: default; }
 
 .number {
   position: absolute;
   top: 14px;
   left: 14px;
-  color: var(--muted);
   font-size: 11px;
+  color: var(--muted);
+  pointer-events: none;
 }
 
 .heading {
   position: absolute;
-  left: 0;
   top: 0;
+  left: 0;
+  display: block;
   margin: 0;
-  white-space: nowrap;
   font-size: 64px;
-  font-weight: 400;
   line-height: 1;
+  font-weight: 400;
   letter-spacing: -.045em;
+  white-space: nowrap;
   transform-origin: 0 0;
-  will-change: transform;
+  pointer-events: none;
+
+  transform:
+    translate(var(--tx,0px),var(--ty,0px))
+    rotate(var(--rot,0deg))
+    scale(var(--scale,1));
+
+  transition:
+    transform var(--speed) var(--ease);
 }
 
 .detail {
   position: absolute;
   left: 24px;
   bottom: 22px;
-  color: var(--muted);
   font-size: 11px;
+  color: var(--muted);
   white-space: nowrap;
-  opacity: 0;
-  transform: translateY(8px);
-  transition:
-    opacity 280ms ease,
-    transform 450ms var(--ease);
   pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 350ms ease,
+    transform 550ms var(--ease);
 }
 
 .panel.active .detail {
@@ -145,8 +167,7 @@ button { font: inherit; }
   transform: translateY(0);
 }
 
-/* Mobile: one large panel, three small panels */
-@media (max-width: 700px) {
+@media(max-width:700px) {
   .app {
     padding: 10px;
     gap: 10px;
@@ -155,25 +176,15 @@ button { font: inherit; }
   .header { font-size: 11px; }
   .footer { font-size: 9px; }
 
-  .rail {
-    display: block;
-  }
-
-  .panel {
-    position: absolute;
-    flex: none;
-    border: 1px solid var(--line);
-    transition: none;
+  .panel::after {
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
   }
 
   .number {
     top: 10px;
     left: 10px;
     font-size: 10px;
-  }
-
-  .heading {
-    font-size: 48px;
   }
 
   .detail {
@@ -183,11 +194,10 @@ button { font: inherit; }
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  :root { --duration: 0ms; }
-
-  .panel, .detail {
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after {
     transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
   }
 }
 </style>
@@ -196,43 +206,55 @@ button { font: inherit; }
 <body>
 <div class="app">
 
-  <header class="header">
-    <span>ORAKLET®</span>
-    <span>VERSION / 0.2</span>
-  </header>
+<header class="header">
+  <span>ORAKLET®</span>
+  <span>VERSION / 0.3</span>
+</header>
 
-  <main class="rail" aria-label="Main navigation">
+<main class="rail" aria-label="Main navigation">
 
-    <button class="panel active" data-section="archive" aria-pressed="true">
-      <span class="number">01</span>
-      <span class="heading">ARCHIVE</span>
-      <span class="detail">COLLECT / ORGANIZE / DISCOVER</span>
-    </button>
+  <button class="panel" data-section="archive"
+          aria-pressed="false">
+    <span class="number">01</span>
+    <span class="heading">ARCHIVE</span>
+    <span class="detail">
+      COLLECT / ORGANIZE / DISCOVER
+    </span>
+  </button>
 
-    <button class="panel" data-section="playground" aria-pressed="false">
-      <span class="number">02</span>
-      <span class="heading">PLAYGROUND</span>
-      <span class="detail">EXPERIMENT / GENERATE / CREATE</span>
-    </button>
+  <button class="panel" data-section="playground"
+          aria-pressed="false">
+    <span class="number">02</span>
+    <span class="heading">PLAYGROUND</span>
+    <span class="detail">
+      EXPERIMENT / GENERATE / CREATE
+    </span>
+  </button>
 
-    <button class="panel" data-section="studio" aria-pressed="false">
-      <span class="number">03</span>
-      <span class="heading">STUDIO</span>
-      <span class="detail">COMPOSE / REFINE / EXPORT</span>
-    </button>
+  <button class="panel" data-section="studio"
+          aria-pressed="false">
+    <span class="number">03</span>
+    <span class="heading">STUDIO</span>
+    <span class="detail">
+      COMPOSE / REFINE / EXPORT
+    </span>
+  </button>
 
-    <button class="panel" data-section="oracle" aria-pressed="false">
-      <span class="number">04</span>
-      <span class="heading">ORACLE</span>
-      <span class="detail">THINK / CONNECT / EXPLORE</span>
-    </button>
+  <button class="panel" data-section="oracle"
+          aria-pressed="false">
+    <span class="number">04</span>
+    <span class="heading">ORACLE</span>
+    <span class="detail">
+      THINK / CONNECT / EXPLORE
+    </span>
+  </button>
 
-  </main>
+</main>
 
-  <footer class="footer">
-    <span>BUILT FOR ONE.</span>
-    <span>OPEN TO EVERYONE.</span>
-  </footer>
+<footer class="footer">
+  <span>BUILT FOR ONE.</span>
+  <span>OPEN TO EVERYONE.</span>
+</footer>
 
 </div>
 
@@ -241,297 +263,274 @@ button { font: inherit; }
   "use strict";
 
   const rail = document.querySelector(".rail");
-  const panels = [...document.querySelectorAll(".panel")];
+  const panels = [...rail.querySelectorAll(".panel")];
   const sections = panels.map(p => p.dataset.section);
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-  const mobileQuery = matchMedia("(max-width: 700px)");
 
-  const DURATION = 850;
-  const EASE = "cubic-bezier(.22, 1, .36, 1)";
+  const mobile = matchMedia("(max-width:700px)");
+  const reduced = matchMedia(
+    "(prefers-reduced-motion:reduce)"
+  );
 
-  let activeSection = "archive";
-  let animations = [];
-  let resizeObserver;
+  let active = sections.includes(location.hash.slice(1))
+    ? location.hash.slice(1)
+    : "archive";
 
-  function stopAnimations() {
-    animations.forEach(animation => animation.cancel());
-    animations = [];
-  }
+  let initialized = false;
+  let resizeFrame = 0;
 
-  function animate(element, frames) {
-    if (reduced.matches) return;
+  /*
+   * CYCLIC ORDER
+   *
+   * The active panel is slot 0.
+   * Remaining panels follow in their original order,
+   * wrapping around at the end.
+   *
+   * ARCHIVE -> PLAYGROUND -> STUDIO -> ORACLE
+   */
 
-    const animation = element.animate(frames, {
-      duration: DURATION,
-      easing: EASE,
-      fill: "none"
-    });
+  function orderedPanels() {
+    const start = sections.indexOf(active);
 
-    animations.push(animation);
-  }
-
-  function mobileRects() {
-    const width = rail.clientWidth;
-    const height = rail.clientHeight;
-
-    const gap = 0;
-    const bottomHeight = Math.max(
-      130,
-      Math.min(height * .34, 260)
-    );
-
-    const topHeight = height - bottomHeight;
-    const smallWidth = width / 3;
-
-    return {
-      large: {
-        x: 0, y: 0,
-        w: width, h: topHeight
-      },
-      small: [0, 1, 2].map(i => ({
-        x: i * smallWidth,
-        y: topHeight,
-        w: smallWidth,
-        h: bottomHeight
-      }))
-    };
-  }
-
-  function setMobileLayout() {
-    const rects = mobileRects();
-    let smallIndex = 0;
-
-    panels.forEach(panel => {
-      const active =
-        panel.dataset.section === activeSection;
-
-      const rect = active
-        ? rects.large
-        : rects.small[smallIndex++];
-
-      panel.style.left = rect.x + "px";
-      panel.style.top = rect.y + "px";
-      panel.style.width = rect.w + "px";
-      panel.style.height = rect.h + "px";
+    return Array.from({length:panels.length},(_,i) => {
+      return panels[(start+i)%panels.length];
     });
   }
 
-  function clearMobileLayout() {
-    panels.forEach(panel => {
-      panel.style.left = "";
-      panel.style.top = "";
-      panel.style.width = "";
-      panel.style.height = "";
-    });
-  }
+  function getSlots() {
+    const w = rail.clientWidth;
+    const h = rail.clientHeight;
 
-  function headingTransform(panel) {
-    const heading = panel.querySelector(".heading");
-    const active = panel.dataset.section === activeSection;
-    const mobile = mobileQuery.matches;
+    if (mobile.matches) {
+      const bottomH = Math.min(
+        Math.max(h*.35,110),
+        h*.48
+      );
 
-    const panelW = panel.clientWidth;
-    const panelH = panel.clientHeight;
-    const textW = heading.offsetWidth;
-    const textH = heading.offsetHeight;
+      const topH = h-bottomH;
+      const cellW = w/3;
 
-    let x, y, scale, rotation;
-
-    if (mobile) {
-      if (active) {
-        scale = Math.min(
-          1,
-          (panelW - 24) / textW
-        );
-        rotation = 0;
-        x = 12;
-        y = (panelH - textH * scale) / 2;
-      } else {
-        scale = Math.min(
-          .35,
-          (panelW - 16) / textW
-        );
-        rotation = 0;
-        x = 8;
-        y = panelH - textH * scale - 12;
-      }
-    } else {
-      if (active) {
-        scale = Math.min(
-          1.25,
-          (panelW - 48) / textW
-        );
-        rotation = 0;
-        x = 24;
-        y = (panelH - textH * scale) / 2;
-      } else {
-        scale = .25;
-        rotation = -90;
-        x = panelW - 15;
-        y = panelH - 16;
-      }
+      return [
+        {x:0,y:0,w:w,h:topH},
+        {x:0,y:topH,w:cellW,h:bottomH},
+        {x:cellW,y:topH,w:cellW,h:bottomH},
+        {x:cellW*2,y:topH,w:w-cellW*2,h:bottomH}
+      ];
     }
 
-    return `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(${scale})`;
+    const closed = Math.min(64,w*.16);
+    const open = Math.max(1,w-closed*3);
+
+    return [
+      {x:0,y:0,w:open,h:h},
+      {x:open,y:0,w:closed,h:h},
+      {x:open+closed,y:0,w:closed,h:h},
+      {x:open+closed*2,y:0,w:closed,h:h}
+    ];
   }
 
-  function positionHeadings(animateChanges = true) {
-    panels.forEach(panel => {
-      const heading = panel.querySelector(".heading");
-      const previous = getComputedStyle(heading).transform;
-      const next = headingTransform(panel);
+  /*
+   * Text positioning is based on TARGET slot
+   * dimensions, not the panel's current dimensions.
+   *
+   * This fixes the disappearing labels in v0.2.
+   */
 
-      heading.style.transform = next;
+  function setHeading(panel,slot,isActive) {
+    const heading = panel.querySelector(".heading");
 
-      if (animateChanges && previous !== "none") {
-        animate(heading, [
-          { transform: previous },
-          { transform: next }
-        ]);
+    const textW = heading.scrollWidth;
+    const textH = heading.offsetHeight;
+
+    let x,y,scale,rotation;
+
+    if (mobile.matches) {
+      if (isActive) {
+        scale = Math.min(
+          1,
+          (slot.w-24)/textW
+        );
+
+        x = 12;
+        y = (slot.h-textH*scale)/2;
+      } else {
+        scale = Math.min(
+          .36,
+          (slot.w-16)/textW
+        );
+
+        x = 8;
+        y = slot.h-textH*scale-12;
       }
-    });
+
+      rotation = 0;
+
+    } else if (isActive) {
+      scale = Math.min(
+        1.25,
+        (slot.w-48)/textW
+      );
+
+      x = 24;
+      y = (slot.h-textH*scale)/2;
+      rotation = 0;
+
+    } else {
+      /*
+       * Rotated text extends UP from the anchor.
+       * Its full length remains inside the panel.
+       */
+      scale = Math.min(
+        .25,
+        (slot.h-45)/textW
+      );
+
+      x = slot.w-14-textH*scale;
+      y = slot.h-16;
+      rotation = -90;
+    }
+
+    scale = Math.max(.05,scale);
+
+    heading.style.setProperty("--tx",x+"px");
+    heading.style.setProperty("--ty",y+"px");
+    heading.style.setProperty("--rot",rotation+"deg");
+    heading.style.setProperty("--scale",scale);
   }
 
-  function activate(section, updateHistory = true) {
-    if (!sections.includes(section)) return;
+  function layout(instant=false) {
+    const order = orderedPanels();
+    const slots = getSlots();
 
-    stopAnimations();
-
-    const mobile = mobileQuery.matches;
-
-    const before = mobile
-      ? new Map(
-          panels.map(panel => [
-            panel,
-            panel.getBoundingClientRect()
-          ])
-        )
-      : null;
-
-    activeSection = section;
-
-    panels.forEach(panel => {
-      const active = panel.dataset.section === section;
-      panel.classList.toggle("active", active);
-      panel.setAttribute("aria-pressed", String(active));
-    });
-
-    if (mobile) {
-      setMobileLayout();
-
-      panels.forEach(panel => {
-        const old = before.get(panel);
-        const next = panel.getBoundingClientRect();
-
-        const dx = old.left - next.left;
-        const dy = old.top - next.top;
-
-        const sx = next.width
-          ? old.width / next.width
-          : 1;
-
-        const sy = next.height
-          ? old.height / next.height
-          : 1;
-
-        if (!reduced.matches) {
-          animate(panel, [
-            {
-              transform:
-                `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`,
-              transformOrigin: "top left"
-            },
-            {
-              transform: "none",
-              transformOrigin: "top left"
-            }
-          ]);
-        }
+    if (instant) {
+      rail.classList.add("instant");
+      panels.forEach(p => {
+        p.style.transition = "none";
+        p.querySelector(".heading").style.transition = "none";
       });
     }
 
-    requestAnimationFrame(() => {
-      positionHeadings(true);
+    order.forEach((panel,index) => {
+      const slot = slots[index];
+      const isActive = index===0;
+
+      panel.classList.toggle("active",isActive);
+      panel.setAttribute("aria-pressed",String(isActive));
+
+      panel.style.left = slot.x+"px";
+      panel.style.top = slot.y+"px";
+      panel.style.width = slot.w+"px";
+      panel.style.height = slot.h+"px";
+
+      setHeading(panel,slot,isActive);
     });
 
-    if (updateHistory &&
-        location.hash.slice(1) !== section) {
-      history.pushState(null, "", "#" + section);
+    if (instant) {
+      /*
+       * Force layout before enabling transitions.
+       * Prevents initial page-load animation.
+       */
+      void rail.offsetWidth;
+
+      panels.forEach(p => {
+        p.style.transition = "";
+        p.querySelector(".heading").style.transition = "";
+      });
+
+      rail.classList.remove("instant");
+    }
+
+    initialized = true;
+  }
+
+  function activate(section,writeHistory=true) {
+    if (!sections.includes(section)) return;
+    if (section===active && initialized) return;
+
+    active = section;
+
+    /*
+     * All four panels move directly toward their
+     * new slots using the same timing.
+     *
+     * CSS transitions automatically continue from
+     * their current interpolated positions.
+     */
+    layout(false);
+
+    if (writeHistory &&
+        location.hash.slice(1)!==section) {
+      history.pushState(null,"","#"+section);
     }
   }
 
-  panels.forEach((panel, index) => {
-    panel.addEventListener("click", () => {
-      if (panel.dataset.section !== activeSection) {
-        activate(panel.dataset.section);
-      }
+  panels.forEach((panel,index) => {
+    panel.addEventListener("click",() => {
+      activate(panel.dataset.section);
     });
 
-    panel.addEventListener("keydown", event => {
+    panel.addEventListener("keydown",event => {
       let next = index;
 
-      if (event.key === "ArrowRight" ||
-          event.key === "ArrowDown") {
-        next = (index + 1) % panels.length;
-      } else if (event.key === "ArrowLeft" ||
-                 event.key === "ArrowUp") {
-        next = (index - 1 + panels.length)
-          % panels.length;
-      } else if (event.key === "Home") {
-        next = 0;
-      } else if (event.key === "End") {
-        next = panels.length - 1;
+      if (
+        event.key==="ArrowRight" ||
+        event.key==="ArrowDown"
+      ) {
+        next=(index+1)%panels.length;
+
+      } else if (
+        event.key==="ArrowLeft" ||
+        event.key==="ArrowUp"
+      ) {
+        next=(index-1+panels.length)%panels.length;
+
+      } else if(event.key==="Home") {
+        next=0;
+
+      } else if(event.key==="End") {
+        next=panels.length-1;
+
       } else {
         return;
       }
 
       event.preventDefault();
+
       panels[next].focus();
       activate(panels[next].dataset.section);
     });
   });
 
-  function syncFromURL() {
-    const section = location.hash.slice(1);
+  function syncURL() {
+    const section=location.hash.slice(1);
     activate(
       sections.includes(section) ? section : "archive",
       false
     );
   }
 
+  window.addEventListener("popstate",syncURL);
+  window.addEventListener("hashchange",syncURL);
+
   function handleResize() {
-    stopAnimations();
-
-    if (mobileQuery.matches) {
-      setMobileLayout();
-    } else {
-      clearMobileLayout();
-    }
-
-    requestAnimationFrame(() => {
-      positionHeadings(false);
+    cancelAnimationFrame(resizeFrame);
+    resizeFrame=requestAnimationFrame(() => {
+      layout(true);
     });
   }
 
-  window.addEventListener("popstate", syncFromURL);
-  window.addEventListener("hashchange", syncFromURL);
+  const observer=new ResizeObserver(handleResize);
+  observer.observe(rail);
 
-  resizeObserver = new ResizeObserver(handleResize);
-  resizeObserver.observe(rail);
+  mobile.addEventListener("change",handleResize);
 
-  mobileQuery.addEventListener("change", handleResize);
+  /*
+   * Font loading can change heading dimensions.
+   */
+  if (document.fonts) {
+    document.fonts.ready.then(() => layout(true));
+  }
 
-  activeSection = sections.includes(location.hash.slice(1))
-    ? location.hash.slice(1)
-    : "archive";
-
-  panels.forEach(panel => {
-    const active = panel.dataset.section === activeSection;
-    panel.classList.toggle("active", active);
-    panel.setAttribute("aria-pressed", String(active));
-  });
-
-  handleResize();
+  layout(true);
 })();
 </script>
 </body>

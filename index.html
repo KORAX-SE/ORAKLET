@@ -3,61 +3,59 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
-<meta name="description" content="Oraklet — Built for one. Open to everyone.">
-<title>Oraklet — 0.4</title>
+<meta name="description" content="Korax: Oraklet — Built for one. Open to everyone.">
+<title>Korax: Oraklet ®</title>
 
 <style>
 /* ==========================================
-   ORAKLET / VERSION 0.4
+   ORAKLET #6
    ========================================== */
 
 @font-face {
   font-family: "Michelangelus";
   src: url("./fonts/Michelangelus-Regular.woff2") format("woff2");
-  font-style: normal;
   font-weight: 400;
+  font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Michelangelus";
   src: url("./fonts/Michelangelus-Italic.woff2") format("woff2");
-  font-style: italic;
   font-weight: 400;
+  font-style: italic;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Michelangelus";
   src: url("./fonts/Michelangelus-Bold.woff2") format("woff2");
-  font-style: normal;
   font-weight: 700;
+  font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Michelangelus";
   src: url("./fonts/Michelangelus-BoldItalic.woff2") format("woff2");
-  font-style: italic;
   font-weight: 700;
+  font-style: italic;
   font-display: swap;
 }
 
 :root {
   color-scheme: dark;
 
-  --bg: #000;
-  --fg: #fff;
+  --black: #000;
+  --white: #fff;
   --muted: #999;
-  --line: #fff;
 
-  --font-display: "Michelangelus", Georgia, serif;
-  --font-ui: Arial, Helvetica, sans-serif;
+  --display: "Michelangelus", Georgia, serif;
+  --ui: Arial, Helvetica, sans-serif;
 
-  --duration: 850ms;
-  --ease: cubic-bezier(.22, 1, .36, 1);
+  --duration: 900;
 }
 
 * {
@@ -67,15 +65,31 @@
 html,
 body {
   width: 100%;
-  min-height: 100%;
+  height: 100%;
   margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html {
+  position: fixed;
+  inset: 0;
+  width: 100%;
 }
 
 body {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: var(--font-ui);
+  position: fixed;
+  inset: 0;
+
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--ui);
   -webkit-font-smoothing: antialiased;
+
+  overscroll-behavior: none;
+  touch-action: none;
 }
 
 button,
@@ -88,25 +102,60 @@ button {
 }
 
 .app {
+  position: absolute;
+  inset: 0;
+
+  height: 100%;
   height: 100dvh;
-  min-height: 320px;
+  min-height: 0;
+
   padding: 20px;
+
   display: flex;
   flex-direction: column;
   gap: 14px;
+
+  overflow: hidden;
+  overscroll-behavior: none;
 }
+
+/* ==========================================
+   HEADER / FOOTER
+   ========================================== */
 
 .header,
 .footer {
-  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex: none;
+  min-width: 0;
 }
 
 .header {
   font-size: 13px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .35em;
+  white-space: nowrap;
+}
+
+.brand a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.brand a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.version {
+  white-space: nowrap;
 }
 
 .footer {
@@ -115,52 +164,50 @@ button {
 }
 
 /* ==========================================
-   NAVIGATION CANVAS
+   NAVIGATION STAGE
    ========================================== */
 
 .rail {
   position: relative;
+
   flex: 1;
   min-width: 0;
   min-height: 0;
+
+  background: var(--black);
   overflow: hidden;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  touch-action: pan-y;
+
+  border: 1px solid var(--white);
+
+  touch-action: none;
+  overscroll-behavior: none;
+  isolation: isolate;
 }
 
-/*
-  Panels never draw borders themselves.
-
-  The frame and separators belong to a
-  dedicated overlay, independent of panel
-  stacking and movement.
-*/
+/* ==========================================
+   PANELS
+   ========================================== */
 
 .panel {
   position: absolute;
-  left: 0;
   top: 0;
+  left: 0;
+
   width: 0;
   height: 0;
 
   margin: 0;
   padding: 0;
+
   border: 0;
   border-radius: 0;
 
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--black);
+  color: var(--white);
 
   overflow: hidden;
-  cursor: pointer;
   outline: none;
-
-  transition:
-    left var(--duration) var(--ease),
-    top var(--duration) var(--ease),
-    width var(--duration) var(--ease),
-    height var(--duration) var(--ease);
+  cursor: pointer;
 }
 
 .panel.active {
@@ -168,9 +215,8 @@ button {
 }
 
 .panel:focus-visible {
-  outline: 2px solid var(--fg);
-  outline-offset: -4px;
-  z-index: 3;
+  outline: 2px solid var(--white);
+  outline-offset: -3px;
 }
 
 .panel-number {
@@ -178,6 +224,7 @@ button {
   top: 14px;
   left: 14px;
 
+  font-family: var(--ui);
   font-size: 11px;
   line-height: 1;
   color: var(--muted);
@@ -193,39 +240,37 @@ button {
   margin: 0;
   padding: 0;
 
-  font-family: var(--font-display);
+  font-family: var(--display);
+  font-size: 76px;
   font-weight: 400;
   font-style: normal;
-  font-size: 72px;
-  line-height: 1.15;
+  line-height: 1.16;
   letter-spacing: -.025em;
-  white-space: nowrap;
 
+  white-space: nowrap;
   transform-origin: 0 0;
   pointer-events: none;
-
-  transition: transform var(--duration) var(--ease);
 }
 
 .panel-detail {
   position: absolute;
-  bottom: 22px;
   left: 24px;
+  bottom: 22px;
 
-  font-family: var(--font-ui);
+  font-family: var(--ui);
   font-size: 11px;
   line-height: 1.3;
   color: var(--muted);
+
   white-space: nowrap;
+  pointer-events: none;
 
   opacity: 0;
   transform: translateY(5px);
 
   transition:
     opacity 260ms ease,
-    transform 400ms var(--ease);
-
-  pointer-events: none;
+    transform 400ms cubic-bezier(.22,1,.36,1);
 }
 
 .panel.active .panel-detail {
@@ -234,13 +279,13 @@ button {
 }
 
 /* ==========================================
-   ENTER SECTION
+   ENTER LINK
    ========================================== */
 
 .enter-link {
   position: absolute;
   left: 24px;
-  top: calc(50% + 72px);
+  top: calc(50% + 76px);
 
   display: inline-flex;
   align-items: center;
@@ -249,12 +294,12 @@ button {
   width: max-content;
   max-width: calc(100% - 48px);
 
-  color: var(--fg);
-  text-decoration: none;
-
-  font-family: var(--font-ui);
+  font-family: var(--ui);
   font-size: 12px;
   letter-spacing: .035em;
+
+  color: var(--white);
+  text-decoration: none;
 
   opacity: 0;
   visibility: hidden;
@@ -262,7 +307,7 @@ button {
 
   transition:
     opacity 260ms ease,
-    transform 400ms var(--ease),
+    transform 400ms cubic-bezier(.22,1,.36,1),
     visibility 0s linear 260ms;
 
   pointer-events: none;
@@ -275,7 +320,7 @@ button {
 
   transition:
     opacity 260ms ease,
-    transform 400ms var(--ease),
+    transform 400ms cubic-bezier(.22,1,.36,1),
     visibility 0s;
 
   pointer-events: auto;
@@ -287,17 +332,33 @@ button {
 }
 
 .enter-link:focus-visible {
-  outline: 1px solid var(--fg);
+  outline: 1px solid var(--white);
   outline-offset: 6px;
 }
 
 .enter-arrow {
-  font-size: 20px;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  flex: none;
+}
+
+.enter-arrow svg {
+  display: block;
+  width: 17px;
+  height: 17px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
 }
 
 /* ==========================================
-   SMALL NAVIGATION CONTROLS
+   CORNER NAVIGATION
    ========================================== */
 
 .nav-controls {
@@ -309,36 +370,41 @@ button {
   align-items: center;
   gap: 5px;
 
-  z-index: 10;
+  z-index: 20;
+  pointer-events: none;
 }
 
 .nav-button {
-  display: grid;
-  place-items: center;
-
   width: 28px;
   height: 28px;
+
+  display: grid;
+  place-items: center;
 
   padding: 0;
   border: 1px solid transparent;
   border-radius: 0;
 
-  background: #000;
-  color: #fff;
+  background: var(--black);
+  color: var(--white);
+
   cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
 
   transition: border-color 180ms ease;
 }
 
 .nav-button:hover,
 .nav-button:focus-visible {
-  border-color: #fff;
+  border-color: var(--white);
   outline: none;
 }
 
 .nav-button svg {
   width: 15px;
   height: 15px;
+
   fill: none;
   stroke: currentColor;
   stroke-width: 1.5;
@@ -347,25 +413,26 @@ button {
 }
 
 /* ==========================================
-   SEPARATOR OVERLAY
+   LINE LAYER
    ========================================== */
 
-.separators {
+.lines {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 10;
   pointer-events: none;
 }
 
-.separator {
+.line {
   position: absolute;
-  background: var(--line);
+  background: var(--white);
+}
 
-  transition:
-    left var(--duration) var(--ease),
-    top var(--duration) var(--ease),
-    width var(--duration) var(--ease),
-    height var(--duration) var(--ease);
+.mobile-outline {
+  position: absolute;
+  border: 1px solid var(--white);
+  pointer-events: none;
+  display: none;
 }
 
 /* ==========================================
@@ -374,7 +441,12 @@ button {
 
 @media (max-width: 700px) {
   .app {
-    padding: 10px;
+    padding:
+      max(10px, env(safe-area-inset-top))
+      max(10px, env(safe-area-inset-right))
+      max(10px, env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
+
     gap: 10px;
   }
 
@@ -417,11 +489,11 @@ button {
     width: 26px;
     height: 26px;
   }
-}
 
-/* ==========================================
-   REDUCED MOTION
-   ========================================== */
+  .mobile-outline {
+    display: block;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -439,8 +511,12 @@ button {
 <div class="app">
 
   <header class="header">
-    <span>ORAKLET®</span>
-    <span>VERSION / 0.4</span>
+    <div class="brand">
+      <a href="https://korax.se/">Korax</a>
+      <span>: Oraklet ®</span>
+    </div>
+
+    <span class="version">#6</span>
   </header>
 
   <main class="rail" aria-label="Main navigation">
@@ -452,18 +528,24 @@ button {
       data-section="archive"
       role="button"
       tabindex="0"
-      aria-label="Open Archive panel"
+      aria-label="Select Archive"
       aria-current="true"
     >
       <span class="panel-number">01</span>
-      <h2 class="panel-heading">ARCHIVE</h2>
+
+      <h2 class="panel-heading">Archive</h2>
+
       <span class="panel-detail">
         COLLECT / ORGANIZE / DISCOVER
       </span>
 
-      <a class="enter-link" href="./archive/" tabindex="0">
+      <a class="enter-link" href="./archive/">
         <span class="enter-label">ENTER ARCHIVE</span>
-        <span class="enter-arrow" aria-hidden="true">↗</span>
+        <span class="enter-arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 19L19 5M8 5h11v11"/>
+          </svg>
+        </span>
       </a>
     </section>
 
@@ -474,17 +556,23 @@ button {
       data-section="playground"
       role="button"
       tabindex="0"
-      aria-label="Open Playground panel"
+      aria-label="Select Playground"
     >
       <span class="panel-number">02</span>
-      <h2 class="panel-heading">PLAYGROUND</h2>
+
+      <h2 class="panel-heading">Playground</h2>
+
       <span class="panel-detail">
         EXPERIMENT / GENERATE / CREATE
       </span>
 
-      <a class="enter-link" href="./playground/" tabindex="-1">
+      <a class="enter-link" href="./playground/">
         <span class="enter-label">ENTER PLAYGROUND</span>
-        <span class="enter-arrow" aria-hidden="true">↗</span>
+        <span class="enter-arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 19L19 5M8 5h11v11"/>
+          </svg>
+        </span>
       </a>
     </section>
 
@@ -495,17 +583,23 @@ button {
       data-section="studio"
       role="button"
       tabindex="0"
-      aria-label="Open Studio panel"
+      aria-label="Select Studio"
     >
       <span class="panel-number">03</span>
-      <h2 class="panel-heading">STUDIO</h2>
+
+      <h2 class="panel-heading">Studio</h2>
+
       <span class="panel-detail">
         COMPOSE / REFINE / EXPORT
       </span>
 
-      <a class="enter-link" href="./studio/" tabindex="-1">
+      <a class="enter-link" href="./studio/">
         <span class="enter-label">ENTER STUDIO</span>
-        <span class="enter-arrow" aria-hidden="true">↗</span>
+        <span class="enter-arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 19L19 5M8 5h11v11"/>
+          </svg>
+        </span>
       </a>
     </section>
 
@@ -516,31 +610,42 @@ button {
       data-section="oracle"
       role="button"
       tabindex="0"
-      aria-label="Open Oracle panel"
+      aria-label="Select Oracle"
     >
       <span class="panel-number">04</span>
-      <h2 class="panel-heading">ORACLE</h2>
+
+      <h2 class="panel-heading">Oracle</h2>
+
       <span class="panel-detail">
         THINK / CONNECT / EXPLORE
       </span>
 
-      <a class="enter-link" href="./oracle/" tabindex="-1">
+      <a class="enter-link" href="./oracle/">
         <span class="enter-label">ENTER ORACLE</span>
-        <span class="enter-arrow" aria-hidden="true">↗</span>
+        <span class="enter-arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 19L19 5M8 5h11v11"/>
+          </svg>
+        </span>
       </a>
     </section>
 
-    <!-- SHARED SEPARATORS -->
+    <!-- LINES -->
 
-    <div class="separators" aria-hidden="true">
-      <div class="separator"></div>
-      <div class="separator"></div>
-      <div class="separator"></div>
+    <div class="lines" aria-hidden="true">
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+
+      <div class="mobile-outline"></div>
+      <div class="mobile-outline"></div>
+      <div class="mobile-outline"></div>
+      <div class="mobile-outline"></div>
     </div>
 
-    <!-- CORNER CONTROLS -->
+    <!-- NAVIGATION -->
 
-    <nav class="nav-controls" aria-label="Section controls">
+    <nav class="nav-controls" aria-label="Section navigation">
 
       <button
         class="nav-button"
@@ -589,296 +694,291 @@ button {
     ...rail.querySelectorAll(".panel")
   ];
 
-  const separators = [
-    ...rail.querySelectorAll(".separator")
-  ];
-
   const sections = panels.map(
     panel => panel.dataset.section
   );
 
+  const lines = [
+    ...rail.querySelectorAll(".line")
+  ];
+
+  const outlines = [
+    ...rail.querySelectorAll(".mobile-outline")
+  ];
+
+  const controls = document.querySelector(".nav-controls");
+
   const prevButton = document.querySelector("#nav-prev");
   const nextButton = document.querySelector("#nav-next");
 
-  const mobileQuery = matchMedia("(max-width: 700px)");
+  const mobile = matchMedia("(max-width: 700px)");
+  const reduced = matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  );
+
+  const DURATION = 900;
 
   let active = sections.includes(location.hash.slice(1))
     ? location.hash.slice(1)
     : "archive";
 
-  let initialized = false;
+  let currentRects = new Map();
+  let currentHeadings = new Map();
+
+  let animation = null;
   let resizeFrame = 0;
 
-  let touchStart = null;
+  let pointerStart = null;
   let suppressClickUntil = 0;
 
   /* ========================================
-     ORDER
+     EASING
+     ======================================== */
+
+  function ease(t) {
+    return 1 - Math.pow(1 - t, 4);
+  }
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function interpolateRect(a, b, t) {
+    return {
+      x: lerp(a.x, b.x, t),
+      y: lerp(a.y, b.y, t),
+      w: lerp(a.w, b.w, t),
+      h: lerp(a.h, b.h, t)
+    };
+  }
+
+  function interpolateHeading(a, b, t) {
+    return {
+      x: lerp(a.x, b.x, t),
+      y: lerp(a.y, b.y, t),
+      scale: lerp(a.scale, b.scale, t),
+      rotation: lerp(a.rotation, b.rotation, t)
+    };
+  }
+
+  /* ========================================
+     ORDER AND SLOTS
      ======================================== */
 
   function getOrder() {
-    if (!mobileQuery.matches) {
-      // Desktop keeps a fixed physical order.
+    if (!mobile.matches) {
       return panels;
     }
 
-    // Mobile rotates through the four sections.
     const start = sections.indexOf(active);
 
     return Array.from(
       { length: panels.length },
-      (_, index) => panels[(start + index) % panels.length]
+      (_, i) => panels[(start + i) % panels.length]
     );
   }
 
-  /* ========================================
-     LAYOUT SLOTS
-     ======================================== */
+  function getTargetRects() {
+    const w = rail.clientWidth;
+    const h = rail.clientHeight;
 
-  function getSlots() {
-    const width = rail.clientWidth;
-    const height = rail.clientHeight;
+    const result = new Map();
 
-    if (mobileQuery.matches) {
-      const bottomHeight = Math.min(
-        Math.max(height * 0.32, 100),
-        height * 0.46
+    if (mobile.matches) {
+      const bottomH = Math.min(
+        Math.max(h * .32, 100),
+        h * .46
       );
 
-      const topHeight = height - bottomHeight;
-      const smallWidth = width / 3;
+      const topH = h - bottomH;
+      const cellW = w / 3;
 
-      return [
+      const slots = [
+        { x: 0, y: 0, w, h: topH },
+        { x: 0, y: topH, w: cellW, h: bottomH },
+        { x: cellW, y: topH, w: cellW, h: bottomH },
         {
-          x: 0,
-          y: 0,
-          w: width,
-          h: topHeight
-        },
-        {
-          x: 0,
-          y: topHeight,
-          w: smallWidth,
-          h: bottomHeight
-        },
-        {
-          x: smallWidth,
-          y: topHeight,
-          w: smallWidth,
-          h: bottomHeight
-        },
-        {
-          x: smallWidth * 2,
-          y: topHeight,
-          w: width - smallWidth * 2,
-          h: bottomHeight
+          x: cellW * 2,
+          y: topH,
+          w: w - cellW * 2,
+          h: bottomH
         }
       ];
+
+      getOrder().forEach((panel, i) => {
+        result.set(panel, slots[i]);
+      });
+
+      return result;
     }
 
-    /*
-      Desktop:
-      Preserve the physical order of panels.
+    const closed = Math.min(64, w * .16);
+    const open = Math.max(1, w - closed * 3);
 
-      The active panel receives remaining width,
-      and inactive panels receive a fixed width.
-    */
+    let x = 0;
 
-    const closedWidth = Math.min(64, width * 0.16);
-    const openWidth = Math.max(1, width - closedWidth * 3);
+    panels.forEach(panel => {
+      const width = panel.dataset.section === active
+        ? open
+        : closed;
 
-    let cursor = 0;
-
-    return panels.map(panel => {
-      const isActive = panel.dataset.section === active;
-
-      const panelWidth = isActive
-        ? openWidth
-        : closedWidth;
-
-      const slot = {
-        x: cursor,
+      result.set(panel, {
+        x,
         y: 0,
-        w: panelWidth,
-        h: height
-      };
+        w: width,
+        h
+      });
 
-      cursor += panelWidth;
-
-      return slot;
+      x += width;
     });
+
+    return result;
   }
 
   /* ========================================
-     HEADING TRANSFORMS
+     HEADING GEOMETRY
      ======================================== */
 
-  function updateHeading(panel, slot, isActive) {
+  function getHeadingTarget(panel, rect) {
     const heading = panel.querySelector(".panel-heading");
 
-    const textWidth = Math.max(
-      1,
-      heading.scrollWidth
-    );
+    const textW = Math.max(1, heading.scrollWidth);
+    const textH = Math.max(1, heading.offsetHeight);
 
-    const textHeight = Math.max(
-      1,
-      heading.offsetHeight
-    );
+    const isActive = panel.dataset.section === active;
 
     let x;
     let y;
     let scale;
     let rotation;
 
-    if (mobileQuery.matches) {
-
+    if (mobile.matches) {
       if (isActive) {
         scale = Math.min(
           1.15,
-          Math.max(0.1, (slot.w - 24) / textWidth)
+          Math.max(.08, (rect.w - 24) / textW)
         );
 
         x = 12;
-        y = (slot.h - textHeight * scale) / 2;
+        y = (rect.h - textH * scale) / 2;
         rotation = 0;
-
       } else {
         scale = Math.min(
-          0.34,
-          Math.max(0.08, (slot.w - 16) / textWidth)
+          .34,
+          Math.max(.06, (rect.w - 16) / textW)
         );
 
         x = 8;
-        y = slot.h - textHeight * scale - 12;
+        y = rect.h - textH * scale - 12;
         rotation = 0;
       }
-
     } else {
-
       if (isActive) {
         scale = Math.min(
           1.2,
-          Math.max(0.1, (slot.w - 48) / textWidth)
+          Math.max(.08, (rect.w - 48) / textW)
         );
 
         x = 24;
-        y = (slot.h - textHeight * scale) / 2;
+        y = (rect.h - textH * scale) / 2;
         rotation = 0;
-
       } else {
-        /*
-          For -90 degrees rotation:
-          x is the right edge of the text,
-          y is the lower anchor.
-
-          The rotated text extends upward.
-        */
-
         scale = Math.min(
-          0.24,
-          Math.max(0.08, (slot.h - 40) / textWidth)
+          .24,
+          Math.max(.06, (rect.h - 40) / textW)
         );
 
-        x = slot.w - 14 - textHeight * scale;
-        y = slot.h - 16;
+        x = rect.w - 14 - textH * scale;
+        y = rect.h - 16;
         rotation = -90;
       }
     }
 
+    return { x, y, scale, rotation };
+  }
+
+  /* ========================================
+     RENDER
+     ======================================== */
+
+  function setRect(element, rect) {
+    element.style.left = rect.x + "px";
+    element.style.top = rect.y + "px";
+    element.style.width = rect.w + "px";
+    element.style.height = rect.h + "px";
+  }
+
+  function setHeading(panel, geometry) {
+    const heading = panel.querySelector(".panel-heading");
+
     heading.style.transform =
-      `translate(${x}px, ${y}px) ` +
-      `rotate(${rotation}deg) ` +
-      `scale(${scale})`;
+      `translate(${geometry.x}px, ${geometry.y}px) ` +
+      `rotate(${geometry.rotation}deg) ` +
+      `scale(${geometry.scale})`;
   }
 
-  /* ========================================
-     SHARED SEPARATORS
-     ======================================== */
-
-  function updateSeparators(slots) {
-    const width = rail.clientWidth;
-    const height = rail.clientHeight;
-
-    if (mobileQuery.matches) {
-      const topHeight = slots[0].h;
-      const cellWidth = width / 3;
-
-      const lines = [
-        {
-          x: 0,
-          y: topHeight,
-          w: width,
-          h: 1
-        },
-        {
-          x: cellWidth,
-          y: topHeight,
-          w: 1,
-          h: height - topHeight
-        },
-        {
-          x: cellWidth * 2,
-          y: topHeight,
-          w: 1,
-          h: height - topHeight
-        }
-      ];
-
-      separators.forEach((line, index) => {
-        const rect = lines[index];
-
-        line.style.left = rect.x + "px";
-        line.style.top = rect.y + "px";
-        line.style.width = rect.w + "px";
-        line.style.height = rect.h + "px";
-      });
-
-      return;
-    }
-
-    /*
-      Desktop separators follow cumulative
-      panel widths, not panel DOM order.
-    */
-
-    let cursor = 0;
-
-    separators.forEach((line, index) => {
-      cursor += slots[index].w;
-
-      line.style.left = cursor + "px";
-      line.style.top = "0px";
-      line.style.width = "1px";
-      line.style.height = height + "px";
+  function render(rects, headings) {
+    panels.forEach(panel => {
+      setRect(panel, rects.get(panel));
+      setHeading(panel, headings.get(panel));
     });
+
+    const activePanel = panels.find(
+      panel => panel.dataset.section === active
+    );
+
+    const activeRect = rects.get(activePanel);
+
+    controls.style.left =
+      (activeRect.x + activeRect.w - controls.offsetWidth -
+        (mobile.matches ? 8 : 12)) + "px";
+
+    controls.style.top =
+      (activeRect.y + (mobile.matches ? 8 : 12)) + "px";
+
+    controls.style.right = "auto";
+
+    if (mobile.matches) {
+      lines.forEach(line => {
+        line.style.display = "none";
+      });
+
+      panels.forEach((panel, i) => {
+        const rect = rects.get(panel);
+
+        outlines[i].style.display = "block";
+        setRect(outlines[i], rect);
+      });
+
+    } else {
+      outlines.forEach(outline => {
+        outline.style.display = "none";
+      });
+
+      let boundary = 0;
+
+      for (let i = 0; i < 3; i++) {
+        boundary += rects.get(panels[i]).w;
+
+        const line = lines[i];
+
+        line.style.display = "block";
+        line.style.left = boundary + "px";
+        line.style.top = "0px";
+        line.style.width = "1px";
+        line.style.height = rail.clientHeight + "px";
+      }
+    }
   }
 
   /* ========================================
-     LAYOUT
+     ACTIVE STATES
      ======================================== */
 
-  function layout(instant = false) {
-    const order = getOrder();
-    const slots = getSlots();
-
-    if (instant) {
-      panels.forEach(panel => {
-        panel.style.transition = "none";
-
-        panel.querySelector(
-          ".panel-heading"
-        ).style.transition = "none";
-      });
-
-      separators.forEach(line => {
-        line.style.transition = "none";
-      });
-    }
-
-    order.forEach((panel, index) => {
-      const slot = slots[index];
-      const isActive = panel.dataset.section === active;
+  function updateActiveStates() {
+    panels.forEach(panel => {
+      const isActive =
+        panel.dataset.section === active;
 
       panel.classList.toggle("active", isActive);
 
@@ -888,36 +988,119 @@ button {
         panel.removeAttribute("aria-current");
       }
 
-      panel.style.left = slot.x + "px";
-      panel.style.top = slot.y + "px";
-      panel.style.width = slot.w + "px";
-      panel.style.height = slot.h + "px";
-
       const link = panel.querySelector(".enter-link");
       link.tabIndex = isActive ? 0 : -1;
+    });
+  }
 
-      updateHeading(panel, slot, isActive);
+  /* ========================================
+     ANIMATION ENGINE
+     ======================================== */
+
+  function stopAnimation() {
+    if (animation !== null) {
+      cancelAnimationFrame(animation);
+      animation = null;
+    }
+  }
+
+  function animateToTargets(instant = false) {
+    stopAnimation();
+
+    const targetRects = getTargetRects();
+    const targetHeadings = new Map();
+
+    panels.forEach(panel => {
+      targetHeadings.set(
+        panel,
+        getHeadingTarget(panel, targetRects.get(panel))
+      );
     });
 
-    updateSeparators(slots);
+    if (
+      instant ||
+      reduced.matches ||
+      currentRects.size === 0
+    ) {
+      currentRects = targetRects;
+      currentHeadings = targetHeadings;
 
-    if (instant) {
-      void rail.offsetWidth;
-
-      panels.forEach(panel => {
-        panel.style.transition = "";
-
-        panel.querySelector(
-          ".panel-heading"
-        ).style.transition = "";
-      });
-
-      separators.forEach(line => {
-        line.style.transition = "";
-      });
+      render(currentRects, currentHeadings);
+      return;
     }
 
-    initialized = true;
+    const startRects = new Map(currentRects);
+    const startHeadings = new Map(currentHeadings);
+
+    const startTime = performance.now();
+
+    function frame(now) {
+      const progress = Math.min(
+        1,
+        (now - startTime) / DURATION
+      );
+
+      const t = ease(progress);
+
+      const nextRects = new Map();
+      const nextHeadings = new Map();
+
+      panels.forEach(panel => {
+        nextRects.set(
+          panel,
+          interpolateRect(
+            startRects.get(panel),
+            targetRects.get(panel),
+            t
+          )
+        );
+
+        nextHeadings.set(
+          panel,
+          interpolateHeading(
+            startHeadings.get(panel),
+            targetHeadings.get(panel),
+            t
+          )
+        );
+      });
+
+      if (!mobile.matches) {
+        let x = 0;
+
+        panels.forEach((panel, index) => {
+          const rect = nextRects.get(panel);
+
+          rect.x = x;
+          rect.y = 0;
+          rect.h = rail.clientHeight;
+
+          if (index === panels.length - 1) {
+            rect.w = rail.clientWidth - x;
+          }
+
+          x += rect.w;
+        });
+      }
+
+      currentRects = nextRects;
+      currentHeadings = nextHeadings;
+
+      render(currentRects, currentHeadings);
+
+      if (progress < 1) {
+        animation = requestAnimationFrame(frame);
+      } else {
+        animation = null;
+
+        currentRects = targetRects;
+        currentHeadings = targetHeadings;
+
+        render(currentRects, currentHeadings);
+      }
+    }
+
+    animation = requestAnimationFrame(frame);
   }
 
   /* ========================================
@@ -926,14 +1109,12 @@ button {
 
   function activate(section, updateHistory = true) {
     if (!sections.includes(section)) return;
-
-    if (section === active && initialized) {
-      return;
-    }
+    if (section === active) return;
 
     active = section;
 
-    layout(false);
+    updateActiveStates();
+    animateToTargets(false);
 
     if (
       updateHistory &&
@@ -962,7 +1143,7 @@ button {
   });
 
   /* ========================================
-     PANEL INTERACTIONS
+     PANEL CLICKS + KEYBOARD
      ======================================== */
 
   panels.forEach((panel, index) => {
@@ -1029,7 +1210,7 @@ button {
      ======================================== */
 
   rail.addEventListener("pointerdown", event => {
-    if (!mobileQuery.matches) return;
+    if (!mobile.matches) return;
     if (event.pointerType === "mouse") return;
 
     if (event.target.closest(".nav-controls")) {
@@ -1040,39 +1221,30 @@ button {
       return;
     }
 
-    touchStart = {
+    pointerStart = {
       x: event.clientX,
       y: event.clientY,
-      time: performance.now(),
-      pointerId: event.pointerId
+      id: event.pointerId,
+      time: performance.now()
     };
   });
 
   rail.addEventListener("pointerup", event => {
-    if (!touchStart) return;
+    if (!pointerStart) return;
 
-    if (event.pointerId !== touchStart.pointerId) {
+    if (event.pointerId !== pointerStart.id) {
       return;
     }
 
-    const dx = event.clientX - touchStart.x;
-    const dy = event.clientY - touchStart.y;
-    const elapsed = performance.now() - touchStart.time;
+    const dx = event.clientX - pointerStart.x;
+    const dy = event.clientY - pointerStart.y;
+    const elapsed = performance.now() - pointerStart.time;
 
-    touchStart = null;
-
-    const distance = Math.abs(dx);
-
-    /*
-      Require a clear horizontal gesture.
-
-      Vertical movement remains available
-      for normal scrolling.
-    */
+    pointerStart = null;
 
     if (
-      distance < 45 ||
-      distance < Math.abs(dy) * 1.3 ||
+      Math.abs(dx) < 45 ||
+      Math.abs(dx) < Math.abs(dy) * 1.3 ||
       elapsed > 1200
     ) {
       return;
@@ -1080,19 +1252,15 @@ button {
 
     suppressClickUntil = performance.now() + 450;
 
-    if (dx < 0) {
-      move(1);
-    } else {
-      move(-1);
-    }
+    move(dx < 0 ? 1 : -1);
   });
 
   rail.addEventListener("pointercancel", () => {
-    touchStart = null;
+    pointerStart = null;
   });
 
   /* ========================================
-     URL HISTORY
+     HISTORY
      ======================================== */
 
   function syncURL() {
@@ -1110,29 +1278,33 @@ button {
   window.addEventListener("hashchange", syncURL);
 
   /* ========================================
-     RESIZE + FONT LOADING
+     RESIZE + VIEWPORT
      ======================================== */
 
   function handleResize() {
     cancelAnimationFrame(resizeFrame);
 
     resizeFrame = requestAnimationFrame(() => {
-      layout(true);
+      stopAnimation();
+      animateToTargets(true);
     });
   }
 
   const observer = new ResizeObserver(handleResize);
-
   observer.observe(rail);
 
-  mobileQuery.addEventListener(
-    "change",
-    handleResize
-  );
+  mobile.addEventListener("change", handleResize);
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener(
+      "resize",
+      handleResize
+    );
+  }
 
   if (document.fonts) {
     document.fonts.ready.then(() => {
-      layout(true);
+      animateToTargets(true);
     });
   }
 
@@ -1140,7 +1312,8 @@ button {
      INITIALIZE
      ======================================== */
 
-  layout(true);
+  updateActiveStates();
+  animateToTargets(true);
 
 })();
 </script>

@@ -3,199 +3,430 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#000000">
 <meta name="description" content="Oraklet — Built for one. Open to everyone.">
-<title>Oraklet — 0.3</title>
+<title>Oraklet — 0.4</title>
 
 <style>
+/* ==========================================
+   ORAKLET / VERSION 0.4
+   ========================================== */
+
+@font-face {
+  font-family: "Michelangelus";
+  src: url("./fonts/Michelangelus-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Michelangelus";
+  src: url("./fonts/Michelangelus-Italic.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Michelangelus";
+  src: url("./fonts/Michelangelus-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Michelangelus";
+  src: url("./fonts/Michelangelus-BoldItalic.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
   color-scheme: dark;
+
   --bg: #000;
   --fg: #fff;
   --muted: #999;
   --line: #fff;
-  --speed: 900ms;
-  --ease: cubic-bezier(.22,1,.36,1);
-  --closed: 64px;
+
+  --font-display: "Michelangelus", Georgia, serif;
+  --font-ui: Arial, Helvetica, sans-serif;
+
+  --duration: 850ms;
+  --ease: cubic-bezier(.22, 1, .36, 1);
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-html,body {
+html,
+body {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   margin: 0;
 }
 
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: Arial,Helvetica,sans-serif;
+  font-family: var(--font-ui);
   -webkit-font-smoothing: antialiased;
 }
 
-button { font: inherit; }
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+}
 
 .app {
   height: 100dvh;
-  min-height: 350px;
+  min-height: 320px;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-.header,.footer {
+.header,
+.footer {
   flex: none;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
 }
 
-.header { font-size: 13px; }
+.header {
+  font-size: 13px;
+}
 
 .footer {
   font-size: 11px;
   color: var(--muted);
 }
 
+/* ==========================================
+   NAVIGATION CANVAS
+   ========================================== */
+
 .rail {
   position: relative;
   flex: 1;
+  min-width: 0;
   min-height: 0;
-  width: 100%;
   overflow: hidden;
+  background: var(--bg);
   border: 1px solid var(--line);
-  background: #000;
+  touch-action: pan-y;
 }
+
+/*
+  Panels never draw borders themselves.
+
+  The frame and separators belong to a
+  dedicated overlay, independent of panel
+  stacking and movement.
+*/
 
 .panel {
   position: absolute;
-  top: 0;
   left: 0;
+  top: 0;
   width: 0;
   height: 0;
-  padding: 0;
+
   margin: 0;
+  padding: 0;
   border: 0;
   border-radius: 0;
-  background: #000;
-  color: #fff;
-  text-align: left;
-  cursor: pointer;
+
+  background: var(--bg);
+  color: var(--fg);
+
   overflow: hidden;
-  isolation: isolate;
+  cursor: pointer;
+  outline: none;
 
   transition:
-    left var(--speed) var(--ease),
-    top var(--speed) var(--ease),
-    width var(--speed) var(--ease),
-    height var(--speed) var(--ease);
+    left var(--duration) var(--ease),
+    top var(--duration) var(--ease),
+    width var(--duration) var(--ease),
+    height var(--duration) var(--ease);
 }
 
-.panel::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-right: 1px solid var(--line);
-  pointer-events: none;
-}
-
-.panel:last-child::after {
-  border-right: 0;
+.panel.active {
+  cursor: default;
 }
 
 .panel:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: -3px;
-  z-index: 10;
+  outline: 2px solid var(--fg);
+  outline-offset: -4px;
+  z-index: 3;
 }
 
-.panel.active { cursor: default; }
-
-.number {
+.panel-number {
   position: absolute;
   top: 14px;
   left: 14px;
+
   font-size: 11px;
+  line-height: 1;
   color: var(--muted);
+
   pointer-events: none;
 }
 
-.heading {
+.panel-heading {
   position: absolute;
   top: 0;
   left: 0;
-  display: block;
+
   margin: 0;
-  font-size: 64px;
-  line-height: 1;
+  padding: 0;
+
+  font-family: var(--font-display);
   font-weight: 400;
-  letter-spacing: -.045em;
+  font-style: normal;
+  font-size: 72px;
+  line-height: 1.15;
+  letter-spacing: -.025em;
   white-space: nowrap;
+
   transform-origin: 0 0;
   pointer-events: none;
 
-  transform:
-    translate(var(--tx,0px),var(--ty,0px))
-    rotate(var(--rot,0deg))
-    scale(var(--scale,1));
-
-  transition:
-    transform var(--speed) var(--ease);
+  transition: transform var(--duration) var(--ease);
 }
 
-.detail {
+.panel-detail {
   position: absolute;
-  left: 24px;
   bottom: 22px;
+  left: 24px;
+
+  font-family: var(--font-ui);
   font-size: 11px;
+  line-height: 1.3;
   color: var(--muted);
   white-space: nowrap;
-  pointer-events: none;
+
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateY(5px);
+
   transition:
-    opacity 350ms ease,
-    transform 550ms var(--ease);
+    opacity 260ms ease,
+    transform 400ms var(--ease);
+
+  pointer-events: none;
 }
 
-.panel.active .detail {
+.panel.active .panel-detail {
   opacity: 1;
   transform: translateY(0);
 }
 
-@media(max-width:700px) {
+/* ==========================================
+   ENTER SECTION
+   ========================================== */
+
+.enter-link {
+  position: absolute;
+  left: 24px;
+  top: calc(50% + 72px);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  width: max-content;
+  max-width: calc(100% - 48px);
+
+  color: var(--fg);
+  text-decoration: none;
+
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: .035em;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(5px);
+
+  transition:
+    opacity 260ms ease,
+    transform 400ms var(--ease),
+    visibility 0s linear 260ms;
+
+  pointer-events: none;
+}
+
+.panel.active .enter-link {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+
+  transition:
+    opacity 260ms ease,
+    transform 400ms var(--ease),
+    visibility 0s;
+
+  pointer-events: auto;
+}
+
+.enter-link:hover .enter-label {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.enter-link:focus-visible {
+  outline: 1px solid var(--fg);
+  outline-offset: 6px;
+}
+
+.enter-arrow {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* ==========================================
+   SMALL NAVIGATION CONTROLS
+   ========================================== */
+
+.nav-controls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  z-index: 10;
+}
+
+.nav-button {
+  display: grid;
+  place-items: center;
+
+  width: 28px;
+  height: 28px;
+
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 0;
+
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+
+  transition: border-color 180ms ease;
+}
+
+.nav-button:hover,
+.nav-button:focus-visible {
+  border-color: #fff;
+  outline: none;
+}
+
+.nav-button svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+/* ==========================================
+   SEPARATOR OVERLAY
+   ========================================== */
+
+.separators {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.separator {
+  position: absolute;
+  background: var(--line);
+
+  transition:
+    left var(--duration) var(--ease),
+    top var(--duration) var(--ease),
+    width var(--duration) var(--ease),
+    height var(--duration) var(--ease);
+}
+
+/* ==========================================
+   MOBILE
+   ========================================== */
+
+@media (max-width: 700px) {
   .app {
     padding: 10px;
     gap: 10px;
   }
 
-  .header { font-size: 11px; }
-  .footer { font-size: 9px; }
-
-  .panel::after {
-    border-right: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
+  .header {
+    font-size: 11px;
   }
 
-  .number {
+  .footer {
+    font-size: 9px;
+  }
+
+  .panel-number {
     top: 10px;
     left: 10px;
     font-size: 10px;
   }
 
-  .detail {
+  .panel-heading {
+    font-size: 64px;
+  }
+
+  .panel-detail {
     left: 12px;
     bottom: 14px;
     font-size: 9px;
   }
+
+  .enter-link {
+    left: 12px;
+    top: calc(50% + 55px);
+    font-size: 10px;
+  }
+
+  .nav-controls {
+    top: 8px;
+    right: 8px;
+  }
+
+  .nav-button {
+    width: 26px;
+    height: 26px;
+  }
 }
 
-@media(prefers-reduced-motion:reduce) {
-  *,*::before,*::after {
+/* ==========================================
+   REDUCED MOTION
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
     transition-duration: 0ms !important;
     animation-duration: 0ms !important;
   }
@@ -204,57 +435,143 @@ button { font: inherit; }
 </head>
 
 <body>
+
 <div class="app">
 
-<header class="header">
-  <span>ORAKLET®</span>
-  <span>VERSION / 0.3</span>
-</header>
+  <header class="header">
+    <span>ORAKLET®</span>
+    <span>VERSION / 0.4</span>
+  </header>
 
-<main class="rail" aria-label="Main navigation">
+  <main class="rail" aria-label="Main navigation">
 
-  <button class="panel" data-section="archive"
-          aria-pressed="false">
-    <span class="number">01</span>
-    <span class="heading">ARCHIVE</span>
-    <span class="detail">
-      COLLECT / ORGANIZE / DISCOVER
-    </span>
-  </button>
+    <!-- ARCHIVE -->
 
-  <button class="panel" data-section="playground"
-          aria-pressed="false">
-    <span class="number">02</span>
-    <span class="heading">PLAYGROUND</span>
-    <span class="detail">
-      EXPERIMENT / GENERATE / CREATE
-    </span>
-  </button>
+    <section
+      class="panel active"
+      data-section="archive"
+      role="button"
+      tabindex="0"
+      aria-label="Open Archive panel"
+      aria-current="true"
+    >
+      <span class="panel-number">01</span>
+      <h2 class="panel-heading">ARCHIVE</h2>
+      <span class="panel-detail">
+        COLLECT / ORGANIZE / DISCOVER
+      </span>
 
-  <button class="panel" data-section="studio"
-          aria-pressed="false">
-    <span class="number">03</span>
-    <span class="heading">STUDIO</span>
-    <span class="detail">
-      COMPOSE / REFINE / EXPORT
-    </span>
-  </button>
+      <a class="enter-link" href="./archive/" tabindex="0">
+        <span class="enter-label">ENTER ARCHIVE</span>
+        <span class="enter-arrow" aria-hidden="true">↗</span>
+      </a>
+    </section>
 
-  <button class="panel" data-section="oracle"
-          aria-pressed="false">
-    <span class="number">04</span>
-    <span class="heading">ORACLE</span>
-    <span class="detail">
-      THINK / CONNECT / EXPLORE
-    </span>
-  </button>
+    <!-- PLAYGROUND -->
 
-</main>
+    <section
+      class="panel"
+      data-section="playground"
+      role="button"
+      tabindex="0"
+      aria-label="Open Playground panel"
+    >
+      <span class="panel-number">02</span>
+      <h2 class="panel-heading">PLAYGROUND</h2>
+      <span class="panel-detail">
+        EXPERIMENT / GENERATE / CREATE
+      </span>
 
-<footer class="footer">
-  <span>BUILT FOR ONE.</span>
-  <span>OPEN TO EVERYONE.</span>
-</footer>
+      <a class="enter-link" href="./playground/" tabindex="-1">
+        <span class="enter-label">ENTER PLAYGROUND</span>
+        <span class="enter-arrow" aria-hidden="true">↗</span>
+      </a>
+    </section>
+
+    <!-- STUDIO -->
+
+    <section
+      class="panel"
+      data-section="studio"
+      role="button"
+      tabindex="0"
+      aria-label="Open Studio panel"
+    >
+      <span class="panel-number">03</span>
+      <h2 class="panel-heading">STUDIO</h2>
+      <span class="panel-detail">
+        COMPOSE / REFINE / EXPORT
+      </span>
+
+      <a class="enter-link" href="./studio/" tabindex="-1">
+        <span class="enter-label">ENTER STUDIO</span>
+        <span class="enter-arrow" aria-hidden="true">↗</span>
+      </a>
+    </section>
+
+    <!-- ORACLE -->
+
+    <section
+      class="panel"
+      data-section="oracle"
+      role="button"
+      tabindex="0"
+      aria-label="Open Oracle panel"
+    >
+      <span class="panel-number">04</span>
+      <h2 class="panel-heading">ORACLE</h2>
+      <span class="panel-detail">
+        THINK / CONNECT / EXPLORE
+      </span>
+
+      <a class="enter-link" href="./oracle/" tabindex="-1">
+        <span class="enter-label">ENTER ORACLE</span>
+        <span class="enter-arrow" aria-hidden="true">↗</span>
+      </a>
+    </section>
+
+    <!-- SHARED SEPARATORS -->
+
+    <div class="separators" aria-hidden="true">
+      <div class="separator"></div>
+      <div class="separator"></div>
+      <div class="separator"></div>
+    </div>
+
+    <!-- CORNER CONTROLS -->
+
+    <nav class="nav-controls" aria-label="Section controls">
+
+      <button
+        class="nav-button"
+        id="nav-prev"
+        type="button"
+        aria-label="Previous section"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+      </button>
+
+      <button
+        class="nav-button"
+        id="nav-next"
+        type="button"
+        aria-label="Next section"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+
+    </nav>
+
+  </main>
+
+  <footer class="footer">
+    <span>BUILT FOR ONE.</span>
+    <span>OPEN TO EVERYONE.</span>
+  </footer>
 
 </div>
 
@@ -262,14 +579,28 @@ button { font: inherit; }
 (() => {
   "use strict";
 
-  const rail = document.querySelector(".rail");
-  const panels = [...rail.querySelectorAll(".panel")];
-  const sections = panels.map(p => p.dataset.section);
+  /* ========================================
+     REFERENCES
+     ======================================== */
 
-  const mobile = matchMedia("(max-width:700px)");
-  const reduced = matchMedia(
-    "(prefers-reduced-motion:reduce)"
+  const rail = document.querySelector(".rail");
+
+  const panels = [
+    ...rail.querySelectorAll(".panel")
+  ];
+
+  const separators = [
+    ...rail.querySelectorAll(".separator")
+  ];
+
+  const sections = panels.map(
+    panel => panel.dataset.section
   );
+
+  const prevButton = document.querySelector("#nav-prev");
+  const nextButton = document.querySelector("#nav-next");
+
+  const mobileQuery = matchMedia("(max-width: 700px)");
 
   let active = sections.includes(location.hash.slice(1))
     ? location.hash.slice(1)
@@ -278,216 +609,409 @@ button { font: inherit; }
   let initialized = false;
   let resizeFrame = 0;
 
-  /*
-   * CYCLIC ORDER
-   *
-   * The active panel is slot 0.
-   * Remaining panels follow in their original order,
-   * wrapping around at the end.
-   *
-   * ARCHIVE -> PLAYGROUND -> STUDIO -> ORACLE
-   */
+  let touchStart = null;
+  let suppressClickUntil = 0;
 
-  function orderedPanels() {
+  /* ========================================
+     ORDER
+     ======================================== */
+
+  function getOrder() {
+    if (!mobileQuery.matches) {
+      // Desktop keeps a fixed physical order.
+      return panels;
+    }
+
+    // Mobile rotates through the four sections.
     const start = sections.indexOf(active);
 
-    return Array.from({length:panels.length},(_,i) => {
-      return panels[(start+i)%panels.length];
-    });
+    return Array.from(
+      { length: panels.length },
+      (_, index) => panels[(start + index) % panels.length]
+    );
   }
 
-  function getSlots() {
-    const w = rail.clientWidth;
-    const h = rail.clientHeight;
+  /* ========================================
+     LAYOUT SLOTS
+     ======================================== */
 
-    if (mobile.matches) {
-      const bottomH = Math.min(
-        Math.max(h*.35,110),
-        h*.48
+  function getSlots() {
+    const width = rail.clientWidth;
+    const height = rail.clientHeight;
+
+    if (mobileQuery.matches) {
+      const bottomHeight = Math.min(
+        Math.max(height * 0.32, 100),
+        height * 0.46
       );
 
-      const topH = h-bottomH;
-      const cellW = w/3;
+      const topHeight = height - bottomHeight;
+      const smallWidth = width / 3;
 
       return [
-        {x:0,y:0,w:w,h:topH},
-        {x:0,y:topH,w:cellW,h:bottomH},
-        {x:cellW,y:topH,w:cellW,h:bottomH},
-        {x:cellW*2,y:topH,w:w-cellW*2,h:bottomH}
+        {
+          x: 0,
+          y: 0,
+          w: width,
+          h: topHeight
+        },
+        {
+          x: 0,
+          y: topHeight,
+          w: smallWidth,
+          h: bottomHeight
+        },
+        {
+          x: smallWidth,
+          y: topHeight,
+          w: smallWidth,
+          h: bottomHeight
+        },
+        {
+          x: smallWidth * 2,
+          y: topHeight,
+          w: width - smallWidth * 2,
+          h: bottomHeight
+        }
       ];
     }
 
-    const closed = Math.min(64,w*.16);
-    const open = Math.max(1,w-closed*3);
+    /*
+      Desktop:
+      Preserve the physical order of panels.
 
-    return [
-      {x:0,y:0,w:open,h:h},
-      {x:open,y:0,w:closed,h:h},
-      {x:open+closed,y:0,w:closed,h:h},
-      {x:open+closed*2,y:0,w:closed,h:h}
-    ];
+      The active panel receives remaining width,
+      and inactive panels receive a fixed width.
+    */
+
+    const closedWidth = Math.min(64, width * 0.16);
+    const openWidth = Math.max(1, width - closedWidth * 3);
+
+    let cursor = 0;
+
+    return panels.map(panel => {
+      const isActive = panel.dataset.section === active;
+
+      const panelWidth = isActive
+        ? openWidth
+        : closedWidth;
+
+      const slot = {
+        x: cursor,
+        y: 0,
+        w: panelWidth,
+        h: height
+      };
+
+      cursor += panelWidth;
+
+      return slot;
+    });
   }
 
-  /*
-   * Text positioning is based on TARGET slot
-   * dimensions, not the panel's current dimensions.
-   *
-   * This fixes the disappearing labels in v0.2.
-   */
+  /* ========================================
+     HEADING TRANSFORMS
+     ======================================== */
 
-  function setHeading(panel,slot,isActive) {
-    const heading = panel.querySelector(".heading");
+  function updateHeading(panel, slot, isActive) {
+    const heading = panel.querySelector(".panel-heading");
 
-    const textW = heading.scrollWidth;
-    const textH = heading.offsetHeight;
+    const textWidth = Math.max(
+      1,
+      heading.scrollWidth
+    );
 
-    let x,y,scale,rotation;
+    const textHeight = Math.max(
+      1,
+      heading.offsetHeight
+    );
 
-    if (mobile.matches) {
+    let x;
+    let y;
+    let scale;
+    let rotation;
+
+    if (mobileQuery.matches) {
+
       if (isActive) {
         scale = Math.min(
-          1,
-          (slot.w-24)/textW
+          1.15,
+          Math.max(0.1, (slot.w - 24) / textWidth)
         );
 
         x = 12;
-        y = (slot.h-textH*scale)/2;
+        y = (slot.h - textHeight * scale) / 2;
+        rotation = 0;
+
       } else {
         scale = Math.min(
-          .36,
-          (slot.w-16)/textW
+          0.34,
+          Math.max(0.08, (slot.w - 16) / textWidth)
         );
 
         x = 8;
-        y = slot.h-textH*scale-12;
+        y = slot.h - textHeight * scale - 12;
+        rotation = 0;
       }
 
-      rotation = 0;
-
-    } else if (isActive) {
-      scale = Math.min(
-        1.25,
-        (slot.w-48)/textW
-      );
-
-      x = 24;
-      y = (slot.h-textH*scale)/2;
-      rotation = 0;
-
     } else {
-      /*
-       * Rotated text extends UP from the anchor.
-       * Its full length remains inside the panel.
-       */
-      scale = Math.min(
-        .25,
-        (slot.h-45)/textW
-      );
 
-      x = slot.w-14-textH*scale;
-      y = slot.h-16;
-      rotation = -90;
+      if (isActive) {
+        scale = Math.min(
+          1.2,
+          Math.max(0.1, (slot.w - 48) / textWidth)
+        );
+
+        x = 24;
+        y = (slot.h - textHeight * scale) / 2;
+        rotation = 0;
+
+      } else {
+        /*
+          For -90 degrees rotation:
+          x is the right edge of the text,
+          y is the lower anchor.
+
+          The rotated text extends upward.
+        */
+
+        scale = Math.min(
+          0.24,
+          Math.max(0.08, (slot.h - 40) / textWidth)
+        );
+
+        x = slot.w - 14 - textHeight * scale;
+        y = slot.h - 16;
+        rotation = -90;
+      }
     }
 
-    scale = Math.max(.05,scale);
-
-    heading.style.setProperty("--tx",x+"px");
-    heading.style.setProperty("--ty",y+"px");
-    heading.style.setProperty("--rot",rotation+"deg");
-    heading.style.setProperty("--scale",scale);
+    heading.style.transform =
+      `translate(${x}px, ${y}px) ` +
+      `rotate(${rotation}deg) ` +
+      `scale(${scale})`;
   }
 
-  function layout(instant=false) {
-    const order = orderedPanels();
+  /* ========================================
+     SHARED SEPARATORS
+     ======================================== */
+
+  function updateSeparators(slots) {
+    const width = rail.clientWidth;
+    const height = rail.clientHeight;
+
+    if (mobileQuery.matches) {
+      const topHeight = slots[0].h;
+      const cellWidth = width / 3;
+
+      const lines = [
+        {
+          x: 0,
+          y: topHeight,
+          w: width,
+          h: 1
+        },
+        {
+          x: cellWidth,
+          y: topHeight,
+          w: 1,
+          h: height - topHeight
+        },
+        {
+          x: cellWidth * 2,
+          y: topHeight,
+          w: 1,
+          h: height - topHeight
+        }
+      ];
+
+      separators.forEach((line, index) => {
+        const rect = lines[index];
+
+        line.style.left = rect.x + "px";
+        line.style.top = rect.y + "px";
+        line.style.width = rect.w + "px";
+        line.style.height = rect.h + "px";
+      });
+
+      return;
+    }
+
+    /*
+      Desktop separators follow cumulative
+      panel widths, not panel DOM order.
+    */
+
+    let cursor = 0;
+
+    separators.forEach((line, index) => {
+      cursor += slots[index].w;
+
+      line.style.left = cursor + "px";
+      line.style.top = "0px";
+      line.style.width = "1px";
+      line.style.height = height + "px";
+    });
+  }
+
+  /* ========================================
+     LAYOUT
+     ======================================== */
+
+  function layout(instant = false) {
+    const order = getOrder();
     const slots = getSlots();
 
     if (instant) {
-      rail.classList.add("instant");
-      panels.forEach(p => {
-        p.style.transition = "none";
-        p.querySelector(".heading").style.transition = "none";
+      panels.forEach(panel => {
+        panel.style.transition = "none";
+
+        panel.querySelector(
+          ".panel-heading"
+        ).style.transition = "none";
+      });
+
+      separators.forEach(line => {
+        line.style.transition = "none";
       });
     }
 
-    order.forEach((panel,index) => {
+    order.forEach((panel, index) => {
       const slot = slots[index];
-      const isActive = index===0;
+      const isActive = panel.dataset.section === active;
 
-      panel.classList.toggle("active",isActive);
-      panel.setAttribute("aria-pressed",String(isActive));
+      panel.classList.toggle("active", isActive);
 
-      panel.style.left = slot.x+"px";
-      panel.style.top = slot.y+"px";
-      panel.style.width = slot.w+"px";
-      panel.style.height = slot.h+"px";
+      if (isActive) {
+        panel.setAttribute("aria-current", "true");
+      } else {
+        panel.removeAttribute("aria-current");
+      }
 
-      setHeading(panel,slot,isActive);
+      panel.style.left = slot.x + "px";
+      panel.style.top = slot.y + "px";
+      panel.style.width = slot.w + "px";
+      panel.style.height = slot.h + "px";
+
+      const link = panel.querySelector(".enter-link");
+      link.tabIndex = isActive ? 0 : -1;
+
+      updateHeading(panel, slot, isActive);
     });
 
+    updateSeparators(slots);
+
     if (instant) {
-      /*
-       * Force layout before enabling transitions.
-       * Prevents initial page-load animation.
-       */
       void rail.offsetWidth;
 
-      panels.forEach(p => {
-        p.style.transition = "";
-        p.querySelector(".heading").style.transition = "";
+      panels.forEach(panel => {
+        panel.style.transition = "";
+
+        panel.querySelector(
+          ".panel-heading"
+        ).style.transition = "";
       });
 
-      rail.classList.remove("instant");
+      separators.forEach(line => {
+        line.style.transition = "";
+      });
     }
 
     initialized = true;
   }
 
-  function activate(section,writeHistory=true) {
+  /* ========================================
+     NAVIGATION
+     ======================================== */
+
+  function activate(section, updateHistory = true) {
     if (!sections.includes(section)) return;
-    if (section===active && initialized) return;
+
+    if (section === active && initialized) {
+      return;
+    }
 
     active = section;
 
-    /*
-     * All four panels move directly toward their
-     * new slots using the same timing.
-     *
-     * CSS transitions automatically continue from
-     * their current interpolated positions.
-     */
     layout(false);
 
-    if (writeHistory &&
-        location.hash.slice(1)!==section) {
-      history.pushState(null,"","#"+section);
+    if (
+      updateHistory &&
+      location.hash.slice(1) !== section
+    ) {
+      history.pushState(null, "", "#" + section);
     }
   }
 
-  panels.forEach((panel,index) => {
-    panel.addEventListener("click",() => {
+  function move(direction) {
+    const index = sections.indexOf(active);
+
+    const next = (
+      index + direction + sections.length
+    ) % sections.length;
+
+    activate(sections[next]);
+  }
+
+  prevButton.addEventListener("click", () => {
+    move(-1);
+  });
+
+  nextButton.addEventListener("click", () => {
+    move(1);
+  });
+
+  /* ========================================
+     PANEL INTERACTIONS
+     ======================================== */
+
+  panels.forEach((panel, index) => {
+    panel.addEventListener("click", event => {
+      if (performance.now() < suppressClickUntil) {
+        event.preventDefault();
+        return;
+      }
+
+      if (event.target.closest("a")) {
+        return;
+      }
+
       activate(panel.dataset.section);
     });
 
-    panel.addEventListener("keydown",event => {
-      let next = index;
+    panel.addEventListener("keydown", event => {
+      if (event.target.closest("a")) return;
 
       if (
-        event.key==="ArrowRight" ||
-        event.key==="ArrowDown"
+        event.key === "Enter" ||
+        event.key === " "
       ) {
-        next=(index+1)%panels.length;
+        event.preventDefault();
+        activate(panel.dataset.section);
+        return;
+      }
+
+      let nextIndex = index;
+
+      if (
+        event.key === "ArrowRight" ||
+        event.key === "ArrowDown"
+      ) {
+        nextIndex = (index + 1) % panels.length;
 
       } else if (
-        event.key==="ArrowLeft" ||
-        event.key==="ArrowUp"
+        event.key === "ArrowLeft" ||
+        event.key === "ArrowUp"
       ) {
-        next=(index-1+panels.length)%panels.length;
+        nextIndex = (
+          index - 1 + panels.length
+        ) % panels.length;
 
-      } else if(event.key==="Home") {
-        next=0;
+      } else if (event.key === "Home") {
+        nextIndex = 0;
 
-      } else if(event.key==="End") {
-        next=panels.length-1;
+      } else if (event.key === "End") {
+        nextIndex = panels.length - 1;
 
       } else {
         return;
@@ -495,43 +1019,131 @@ button { font: inherit; }
 
       event.preventDefault();
 
-      panels[next].focus();
-      activate(panels[next].dataset.section);
+      panels[nextIndex].focus();
+      activate(panels[nextIndex].dataset.section);
     });
   });
 
+  /* ========================================
+     MOBILE SWIPE
+     ======================================== */
+
+  rail.addEventListener("pointerdown", event => {
+    if (!mobileQuery.matches) return;
+    if (event.pointerType === "mouse") return;
+
+    if (event.target.closest(".nav-controls")) {
+      return;
+    }
+
+    if (event.target.closest(".enter-link")) {
+      return;
+    }
+
+    touchStart = {
+      x: event.clientX,
+      y: event.clientY,
+      time: performance.now(),
+      pointerId: event.pointerId
+    };
+  });
+
+  rail.addEventListener("pointerup", event => {
+    if (!touchStart) return;
+
+    if (event.pointerId !== touchStart.pointerId) {
+      return;
+    }
+
+    const dx = event.clientX - touchStart.x;
+    const dy = event.clientY - touchStart.y;
+    const elapsed = performance.now() - touchStart.time;
+
+    touchStart = null;
+
+    const distance = Math.abs(dx);
+
+    /*
+      Require a clear horizontal gesture.
+
+      Vertical movement remains available
+      for normal scrolling.
+    */
+
+    if (
+      distance < 45 ||
+      distance < Math.abs(dy) * 1.3 ||
+      elapsed > 1200
+    ) {
+      return;
+    }
+
+    suppressClickUntil = performance.now() + 450;
+
+    if (dx < 0) {
+      move(1);
+    } else {
+      move(-1);
+    }
+  });
+
+  rail.addEventListener("pointercancel", () => {
+    touchStart = null;
+  });
+
+  /* ========================================
+     URL HISTORY
+     ======================================== */
+
   function syncURL() {
-    const section=location.hash.slice(1);
+    const section = location.hash.slice(1);
+
     activate(
-      sections.includes(section) ? section : "archive",
+      sections.includes(section)
+        ? section
+        : "archive",
       false
     );
   }
 
-  window.addEventListener("popstate",syncURL);
-  window.addEventListener("hashchange",syncURL);
+  window.addEventListener("popstate", syncURL);
+  window.addEventListener("hashchange", syncURL);
+
+  /* ========================================
+     RESIZE + FONT LOADING
+     ======================================== */
 
   function handleResize() {
     cancelAnimationFrame(resizeFrame);
-    resizeFrame=requestAnimationFrame(() => {
+
+    resizeFrame = requestAnimationFrame(() => {
       layout(true);
     });
   }
 
-  const observer=new ResizeObserver(handleResize);
+  const observer = new ResizeObserver(handleResize);
+
   observer.observe(rail);
 
-  mobile.addEventListener("change",handleResize);
+  mobileQuery.addEventListener(
+    "change",
+    handleResize
+  );
 
-  /*
-   * Font loading can change heading dimensions.
-   */
   if (document.fonts) {
-    document.fonts.ready.then(() => layout(true));
+    document.fonts.ready.then(() => {
+      layout(true);
+    });
   }
 
+  /* ========================================
+     INITIALIZE
+     ======================================== */
+
   layout(true);
+
 })();
 </script>
+
 </body>
 </html>

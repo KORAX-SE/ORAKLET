@@ -6,24 +6,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#000000">
 <meta name="description" content="Oraklet — Built for one. Open to everyone.">
-<title>Oraklet</title>
+<title>Oraklet — 0.2</title>
 
 <style>
 :root {
   color-scheme: dark;
   --bg: #000;
   --fg: #fff;
-  --line: #fff;
   --muted: #999;
+  --line: #fff;
   --duration: 850ms;
   --ease: cubic-bezier(.22, 1, .36, 1);
-  --closed-width: 64px;
+  --closed: 64px;
 }
 
 * { box-sizing: border-box; }
 
 html, body {
   margin: 0;
+  width: 100%;
   min-height: 100%;
 }
 
@@ -47,136 +48,105 @@ button { font: inherit; }
 
 .header, .footer {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  align-items: center;
   flex-shrink: 0;
+  gap: 12px;
 }
 
 .header {
   font-size: 13px;
-  letter-spacing: -.02em;
 }
 
 .footer {
-  color: var(--muted);
   font-size: 11px;
-  letter-spacing: .025em;
+  color: var(--muted);
 }
 
 .rail {
+  position: relative;
   display: flex;
   flex: 1;
   min-height: 0;
-  width: 100%;
-  border: 1px solid var(--line);
   overflow: hidden;
+  border: 1px solid var(--line);
 }
 
 .panel {
   position: relative;
-  flex: 0 0 var(--closed-width);
+  flex: 0 0 var(--closed);
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
   padding: 0;
   border: 0;
   border-right: 1px solid var(--line);
   border-radius: 0;
   background: var(--bg);
   color: var(--fg);
-  cursor: pointer;
-  overflow: hidden;
   text-align: left;
-  transition:
-    flex-basis var(--duration) var(--ease),
-    background-color 350ms ease;
+  cursor: pointer;
+  transition: flex-basis var(--duration) var(--ease);
+  will-change: flex-basis;
 }
 
 .panel:last-child { border-right: 0; }
 
 .panel.active {
   flex: 1 1 0;
-  background: #000;
   cursor: default;
 }
 
-.panel:not(.active):hover {
-  background: #151515;
-}
-
 .panel:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--fg);
   outline-offset: -4px;
-  z-index: 2;
+  z-index: 5;
 }
 
 .number {
   position: absolute;
   top: 14px;
   left: 14px;
-  font-size: 11px;
   color: var(--muted);
+  font-size: 11px;
 }
 
 .heading {
   position: absolute;
-  display: block;
+  left: 0;
+  top: 0;
   margin: 0;
-  padding: 0;
   white-space: nowrap;
-  font-size: 15px;
+  font-size: 64px;
   font-weight: 400;
   line-height: 1;
   letter-spacing: -.045em;
-
-  /*
-   * Closed state:
-   * Rotate around the text's bottom-left corner.
-   * Keep the anchor inside the panel.
-   */
-  left: calc(100% - 15px);
-  bottom: 16px;
-  transform-origin: left bottom;
-  transform: rotate(-90deg);
-
-  transition:
-    left var(--duration) var(--ease),
-    bottom var(--duration) var(--ease),
-    transform var(--duration) var(--ease),
-    font-size var(--duration) var(--ease);
-}
-
-.panel.active .heading {
-  left: 24px;
-  bottom: 50%;
-  transform: translateY(50%) rotate(0deg);
-  font-size: clamp(28px, 5vw, 80px);
+  transform-origin: 0 0;
+  will-change: transform;
 }
 
 .detail {
   position: absolute;
   left: 24px;
   bottom: 22px;
-  white-space: nowrap;
   color: var(--muted);
   font-size: 11px;
-  letter-spacing: .025em;
+  white-space: nowrap;
   opacity: 0;
-  transform: translateY(12px);
-  pointer-events: none;
+  transform: translateY(8px);
   transition:
-    opacity 250ms ease,
+    opacity 280ms ease,
     transform 450ms var(--ease);
+  pointer-events: none;
 }
 
 .panel.active .detail {
   opacity: 1;
   transform: translateY(0);
-  transition-delay: 320ms;
 }
 
+/* Mobile: one large panel, three small panels */
 @media (max-width: 700px) {
-  :root { --closed-width: 42px; }
-
   .app {
     padding: 10px;
     gap: 10px;
@@ -185,21 +155,25 @@ button { font: inherit; }
   .header { font-size: 11px; }
   .footer { font-size: 9px; }
 
+  .rail {
+    display: block;
+  }
+
+  .panel {
+    position: absolute;
+    flex: none;
+    border: 1px solid var(--line);
+    transition: none;
+  }
+
   .number {
-    top: 9px;
-    left: 9px;
-    font-size: 9px;
+    top: 10px;
+    left: 10px;
+    font-size: 10px;
   }
 
   .heading {
-    left: calc(100% - 10px);
-    bottom: 12px;
-    font-size: 12px;
-  }
-
-  .panel.active .heading {
-    left: 12px;
-    font-size: clamp(18px, 5vw, 40px);
+    font-size: 48px;
   }
 
   .detail {
@@ -209,22 +183,11 @@ button { font: inherit; }
   }
 }
 
-@media (max-width: 380px) {
-  :root { --closed-width: 34px; }
-
-  .heading { font-size: 10px; }
-
-  .panel.active .heading {
-    font-size: clamp(16px, 4.5vw, 28px);
-  }
-
-  .detail { font-size: 8px; }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
+  :root { --duration: 0ms; }
+
+  .panel, .detail {
+    transition-duration: 0ms !important;
   }
 }
 </style>
@@ -235,38 +198,30 @@ button { font: inherit; }
 
   <header class="header">
     <span>ORAKLET®</span>
-    <span>VERSION / 0.1</span>
+    <span>VERSION / 0.2</span>
   </header>
 
   <main class="rail" aria-label="Main navigation">
 
-    <button class="panel active"
-            data-section="archive"
-            aria-pressed="true">
+    <button class="panel active" data-section="archive" aria-pressed="true">
       <span class="number">01</span>
       <span class="heading">ARCHIVE</span>
       <span class="detail">COLLECT / ORGANIZE / DISCOVER</span>
     </button>
 
-    <button class="panel"
-            data-section="playground"
-            aria-pressed="false">
+    <button class="panel" data-section="playground" aria-pressed="false">
       <span class="number">02</span>
       <span class="heading">PLAYGROUND</span>
       <span class="detail">EXPERIMENT / GENERATE / CREATE</span>
     </button>
 
-    <button class="panel"
-            data-section="studio"
-            aria-pressed="false">
+    <button class="panel" data-section="studio" aria-pressed="false">
       <span class="number">03</span>
       <span class="heading">STUDIO</span>
       <span class="detail">COMPOSE / REFINE / EXPORT</span>
     </button>
 
-    <button class="panel"
-            data-section="oracle"
-            aria-pressed="false">
+    <button class="panel" data-section="oracle" aria-pressed="false">
       <span class="number">04</span>
       <span class="heading">ORACLE</span>
       <span class="detail">THINK / CONNECT / EXPLORE</span>
@@ -285,48 +240,241 @@ button { font: inherit; }
 (() => {
   "use strict";
 
-  const panels = [
-    ...document.querySelectorAll(".panel")
-  ];
+  const rail = document.querySelector(".rail");
+  const panels = [...document.querySelectorAll(".panel")];
+  const sections = panels.map(p => p.dataset.section);
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+  const mobileQuery = matchMedia("(max-width: 700px)");
 
-  const sections = panels.map(
-    panel => panel.dataset.section
-  );
+  const DURATION = 850;
+  const EASE = "cubic-bezier(.22, 1, .36, 1)";
+
+  let activeSection = "archive";
+  let animations = [];
+  let resizeObserver;
+
+  function stopAnimations() {
+    animations.forEach(animation => animation.cancel());
+    animations = [];
+  }
+
+  function animate(element, frames) {
+    if (reduced.matches) return;
+
+    const animation = element.animate(frames, {
+      duration: DURATION,
+      easing: EASE,
+      fill: "none"
+    });
+
+    animations.push(animation);
+  }
+
+  function mobileRects() {
+    const width = rail.clientWidth;
+    const height = rail.clientHeight;
+
+    const gap = 0;
+    const bottomHeight = Math.max(
+      130,
+      Math.min(height * .34, 260)
+    );
+
+    const topHeight = height - bottomHeight;
+    const smallWidth = width / 3;
+
+    return {
+      large: {
+        x: 0, y: 0,
+        w: width, h: topHeight
+      },
+      small: [0, 1, 2].map(i => ({
+        x: i * smallWidth,
+        y: topHeight,
+        w: smallWidth,
+        h: bottomHeight
+      }))
+    };
+  }
+
+  function setMobileLayout() {
+    const rects = mobileRects();
+    let smallIndex = 0;
+
+    panels.forEach(panel => {
+      const active =
+        panel.dataset.section === activeSection;
+
+      const rect = active
+        ? rects.large
+        : rects.small[smallIndex++];
+
+      panel.style.left = rect.x + "px";
+      panel.style.top = rect.y + "px";
+      panel.style.width = rect.w + "px";
+      panel.style.height = rect.h + "px";
+    });
+  }
+
+  function clearMobileLayout() {
+    panels.forEach(panel => {
+      panel.style.left = "";
+      panel.style.top = "";
+      panel.style.width = "";
+      panel.style.height = "";
+    });
+  }
+
+  function headingTransform(panel) {
+    const heading = panel.querySelector(".heading");
+    const active = panel.dataset.section === activeSection;
+    const mobile = mobileQuery.matches;
+
+    const panelW = panel.clientWidth;
+    const panelH = panel.clientHeight;
+    const textW = heading.offsetWidth;
+    const textH = heading.offsetHeight;
+
+    let x, y, scale, rotation;
+
+    if (mobile) {
+      if (active) {
+        scale = Math.min(
+          1,
+          (panelW - 24) / textW
+        );
+        rotation = 0;
+        x = 12;
+        y = (panelH - textH * scale) / 2;
+      } else {
+        scale = Math.min(
+          .35,
+          (panelW - 16) / textW
+        );
+        rotation = 0;
+        x = 8;
+        y = panelH - textH * scale - 12;
+      }
+    } else {
+      if (active) {
+        scale = Math.min(
+          1.25,
+          (panelW - 48) / textW
+        );
+        rotation = 0;
+        x = 24;
+        y = (panelH - textH * scale) / 2;
+      } else {
+        scale = .25;
+        rotation = -90;
+        x = panelW - 15;
+        y = panelH - 16;
+      }
+    }
+
+    return `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(${scale})`;
+  }
+
+  function positionHeadings(animateChanges = true) {
+    panels.forEach(panel => {
+      const heading = panel.querySelector(".heading");
+      const previous = getComputedStyle(heading).transform;
+      const next = headingTransform(panel);
+
+      heading.style.transform = next;
+
+      if (animateChanges && previous !== "none") {
+        animate(heading, [
+          { transform: previous },
+          { transform: next }
+        ]);
+      }
+    });
+  }
 
   function activate(section, updateHistory = true) {
     if (!sections.includes(section)) return;
 
+    stopAnimations();
+
+    const mobile = mobileQuery.matches;
+
+    const before = mobile
+      ? new Map(
+          panels.map(panel => [
+            panel,
+            panel.getBoundingClientRect()
+          ])
+        )
+      : null;
+
+    activeSection = section;
+
     panels.forEach(panel => {
       const active = panel.dataset.section === section;
-
       panel.classList.toggle("active", active);
-      panel.setAttribute(
-        "aria-pressed",
-        String(active)
-      );
+      panel.setAttribute("aria-pressed", String(active));
+    });
+
+    if (mobile) {
+      setMobileLayout();
+
+      panels.forEach(panel => {
+        const old = before.get(panel);
+        const next = panel.getBoundingClientRect();
+
+        const dx = old.left - next.left;
+        const dy = old.top - next.top;
+
+        const sx = next.width
+          ? old.width / next.width
+          : 1;
+
+        const sy = next.height
+          ? old.height / next.height
+          : 1;
+
+        if (!reduced.matches) {
+          animate(panel, [
+            {
+              transform:
+                `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`,
+              transformOrigin: "top left"
+            },
+            {
+              transform: "none",
+              transformOrigin: "top left"
+            }
+          ]);
+        }
+      });
+    }
+
+    requestAnimationFrame(() => {
+      positionHeadings(true);
     });
 
     if (updateHistory &&
         location.hash.slice(1) !== section) {
-      history.pushState(
-        null,
-        "",
-        "#" + section
-      );
+      history.pushState(null, "", "#" + section);
     }
   }
 
   panels.forEach((panel, index) => {
     panel.addEventListener("click", () => {
-      activate(panel.dataset.section);
+      if (panel.dataset.section !== activeSection) {
+        activate(panel.dataset.section);
+      }
     });
 
     panel.addEventListener("keydown", event => {
       let next = index;
 
-      if (event.key === "ArrowRight") {
+      if (event.key === "ArrowRight" ||
+          event.key === "ArrowDown") {
         next = (index + 1) % panels.length;
-      } else if (event.key === "ArrowLeft") {
+      } else if (event.key === "ArrowLeft" ||
+                 event.key === "ArrowUp") {
         next = (index - 1 + panels.length)
           % panels.length;
       } else if (event.key === "Home") {
@@ -351,10 +499,39 @@ button { font: inherit; }
     );
   }
 
+  function handleResize() {
+    stopAnimations();
+
+    if (mobileQuery.matches) {
+      setMobileLayout();
+    } else {
+      clearMobileLayout();
+    }
+
+    requestAnimationFrame(() => {
+      positionHeadings(false);
+    });
+  }
+
   window.addEventListener("popstate", syncFromURL);
   window.addEventListener("hashchange", syncFromURL);
 
-  syncFromURL();
+  resizeObserver = new ResizeObserver(handleResize);
+  resizeObserver.observe(rail);
+
+  mobileQuery.addEventListener("change", handleResize);
+
+  activeSection = sections.includes(location.hash.slice(1))
+    ? location.hash.slice(1)
+    : "archive";
+
+  panels.forEach(panel => {
+    const active = panel.dataset.section === activeSection;
+    panel.classList.toggle("active", active);
+    panel.setAttribute("aria-pressed", String(active));
+  });
+
+  handleResize();
 })();
 </script>
 </body>

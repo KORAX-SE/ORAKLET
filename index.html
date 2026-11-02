@@ -2,16 +2,360 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Oraklet — an open creative environment.">
-  <title>Oraklet</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+<meta name="description" content="Oraklet — Built for one. Open to everyone.">
+<title>Oraklet</title>
+
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #000;
+  --fg: #fff;
+  --line: #fff;
+  --muted: #999;
+  --duration: 850ms;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --closed-width: 64px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font: inherit; }
+
+.app {
+  height: 100dvh;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 14px;
+}
+
+.header, .footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.header {
+  font-size: 13px;
+  letter-spacing: -.02em;
+}
+
+.footer {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: .025em;
+}
+
+.rail {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.panel {
+  position: relative;
+  flex: 0 0 var(--closed-width);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+  overflow: hidden;
+  text-align: left;
+  transition:
+    flex-basis var(--duration) var(--ease),
+    background-color 350ms ease;
+}
+
+.panel:last-child { border-right: 0; }
+
+.panel.active {
+  flex: 1 1 0;
+  background: #000;
+  cursor: default;
+}
+
+.panel:not(.active):hover {
+  background: #151515;
+}
+
+.panel:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -4px;
+  z-index: 2;
+}
+
+.number {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.heading {
+  position: absolute;
+  display: block;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.045em;
+
+  /*
+   * Closed state:
+   * Rotate around the text's bottom-left corner.
+   * Keep the anchor inside the panel.
+   */
+  left: calc(100% - 15px);
+  bottom: 16px;
+  transform-origin: left bottom;
+  transform: rotate(-90deg);
+
+  transition:
+    left var(--duration) var(--ease),
+    bottom var(--duration) var(--ease),
+    transform var(--duration) var(--ease),
+    font-size var(--duration) var(--ease);
+}
+
+.panel.active .heading {
+  left: 24px;
+  bottom: 50%;
+  transform: translateY(50%) rotate(0deg);
+  font-size: clamp(28px, 5vw, 80px);
+}
+
+.detail {
+  position: absolute;
+  left: 24px;
+  bottom: 22px;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: .025em;
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition:
+    opacity 250ms ease,
+    transform 450ms var(--ease);
+}
+
+.panel.active .detail {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 320ms;
+}
+
+@media (max-width: 700px) {
+  :root { --closed-width: 42px; }
+
+  .app {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .header { font-size: 11px; }
+  .footer { font-size: 9px; }
+
+  .number {
+    top: 9px;
+    left: 9px;
+    font-size: 9px;
+  }
+
+  .heading {
+    left: calc(100% - 10px);
+    bottom: 12px;
+    font-size: 12px;
+  }
+
+  .panel.active .heading {
+    left: 12px;
+    font-size: clamp(18px, 5vw, 40px);
+  }
+
+  .detail {
+    left: 12px;
+    bottom: 14px;
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 380px) {
+  :root { --closed-width: 34px; }
+
+  .heading { font-size: 10px; }
+
+  .panel.active .heading {
+    font-size: clamp(16px, 4.5vw, 28px);
+  }
+
+  .detail { font-size: 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+</style>
 </head>
+
 <body>
-  <main>
-    <h1>Oraklet</h1>
-    <p>Built for one. Open to everyone.</p>
-    <p>Under construction.</p>
+<div class="app">
+
+  <header class="header">
+    <span>ORAKLET®</span>
+    <span>VERSION / 0.1</span>
+  </header>
+
+  <main class="rail" aria-label="Main navigation">
+
+    <button class="panel active"
+            data-section="archive"
+            aria-pressed="true">
+      <span class="number">01</span>
+      <span class="heading">ARCHIVE</span>
+      <span class="detail">COLLECT / ORGANIZE / DISCOVER</span>
+    </button>
+
+    <button class="panel"
+            data-section="playground"
+            aria-pressed="false">
+      <span class="number">02</span>
+      <span class="heading">PLAYGROUND</span>
+      <span class="detail">EXPERIMENT / GENERATE / CREATE</span>
+    </button>
+
+    <button class="panel"
+            data-section="studio"
+            aria-pressed="false">
+      <span class="number">03</span>
+      <span class="heading">STUDIO</span>
+      <span class="detail">COMPOSE / REFINE / EXPORT</span>
+    </button>
+
+    <button class="panel"
+            data-section="oracle"
+            aria-pressed="false">
+      <span class="number">04</span>
+      <span class="heading">ORACLE</span>
+      <span class="detail">THINK / CONNECT / EXPLORE</span>
+    </button>
+
   </main>
+
+  <footer class="footer">
+    <span>BUILT FOR ONE.</span>
+    <span>OPEN TO EVERYONE.</span>
+  </footer>
+
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const panels = [
+    ...document.querySelectorAll(".panel")
+  ];
+
+  const sections = panels.map(
+    panel => panel.dataset.section
+  );
+
+  function activate(section, updateHistory = true) {
+    if (!sections.includes(section)) return;
+
+    panels.forEach(panel => {
+      const active = panel.dataset.section === section;
+
+      panel.classList.toggle("active", active);
+      panel.setAttribute(
+        "aria-pressed",
+        String(active)
+      );
+    });
+
+    if (updateHistory &&
+        location.hash.slice(1) !== section) {
+      history.pushState(
+        null,
+        "",
+        "#" + section
+      );
+    }
+  }
+
+  panels.forEach((panel, index) => {
+    panel.addEventListener("click", () => {
+      activate(panel.dataset.section);
+    });
+
+    panel.addEventListener("keydown", event => {
+      let next = index;
+
+      if (event.key === "ArrowRight") {
+        next = (index + 1) % panels.length;
+      } else if (event.key === "ArrowLeft") {
+        next = (index - 1 + panels.length)
+          % panels.length;
+      } else if (event.key === "Home") {
+        next = 0;
+      } else if (event.key === "End") {
+        next = panels.length - 1;
+      } else {
+        return;
+      }
+
+      event.preventDefault();
+      panels[next].focus();
+      activate(panels[next].dataset.section);
+    });
+  });
+
+  function syncFromURL() {
+    const section = location.hash.slice(1);
+    activate(
+      sections.includes(section) ? section : "archive",
+      false
+    );
+  }
+
+  window.addEventListener("popstate", syncFromURL);
+  window.addEventListener("hashchange", syncFromURL);
+
+  syncFromURL();
+})();
+</script>
 </body>
 </html>
